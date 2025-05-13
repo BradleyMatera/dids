@@ -1,0 +1,4 @@
+theme: jekyll-theme-cayman
+title: Decentralized Identifiers (DIDs) with Veilid
+description: Comprehensive documentation on implementing DIDs using the Veilid network
+include: [_includes]

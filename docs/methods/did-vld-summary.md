@@ -1,5 +1,7 @@
 # did:vld Method: Comprehensive Summary
 
+{% include navigation.md %}
+
 This document provides a comprehensive summary of the `did:vld` method, which leverages the Veilid distributed network for creating, resolving, and managing Decentralized Identifiers (DIDs). It brings together the key aspects of the method specification, implementation details, security considerations, and practical applications.
 
 ## 1. Overview

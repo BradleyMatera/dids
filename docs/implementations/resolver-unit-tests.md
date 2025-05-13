@@ -1,5 +1,7 @@
 # did:vld Resolver Unit Tests
 
+{% include navigation.md %}
+
 This document outlines the unit tests for the `did:vld` resolver, which is responsible for retrieving and verifying DID Documents from the Veilid Distributed Hash Table (DHT). These tests ensure that the resolver functions correctly and securely.
 
 ## Overview

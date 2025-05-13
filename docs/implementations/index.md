@@ -7,6 +7,15 @@ This section provides detailed technical guides for implementing specific DID me
 - **[did:web and WebRTC Integration](web.md)**  
   Learn how to implement the `did:web` method and integrate it with WebRTC for secure, real-time communication. This guide covers setting up a DID resolver using standard web infrastructure, configuring WebRTC connections for peer-to-peer communication, and handling cryptographic key management.
 
+- **[Veilid DID Implementation](veilid-did-implementation.md)**  
+  Comprehensive guide to implementing the `did:vld` method using the Veilid network. This implementation leverages Veilid's distributed hash table (DHT) and cryptographic primitives to create a secure, private, and resilient foundation for decentralized identifiers.
+
+- **[Cap'n Proto Schema Update](capnp-schema-update.md)**  
+  Technical details on the Cap'n Proto schema used for the `did:vld` method, providing efficient binary representation of DID-related data structures.
+
+- **[Resolver Unit Tests](resolver-unit-tests.md)**  
+  Documentation of unit tests for the `did:vld` resolver, ensuring it functions correctly and securely for DID resolution and verification.
+
 ## Overview
 
 While a conceptual understanding of Decentralized Identifiers is essential, practical implementation guidance empowers developers to build robust and secure systems. The guides in this section bridge the gap between theory and practice through:

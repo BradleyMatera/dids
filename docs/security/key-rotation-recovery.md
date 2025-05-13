@@ -1,5 +1,7 @@
 # Key Rotation and Recovery Flow
 
+{% include navigation.md %}
+
 This document outlines the key rotation and recovery mechanisms for the `did:vld` method, providing a comprehensive approach to maintaining security and continuity of decentralized identifiers.
 
 ## 1. Introduction
