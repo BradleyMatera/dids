@@ -6,7 +6,7 @@ This document summarizes how we've addressed each of the questions and requireme
 
 **Requirement**: Define the did:vld method specification where the method-specific-id is a 32-byte Blake3 hash of the Veilid public key, and the resolver uses DHT lookup to retrieve the DID Document.
 
-**Solution**: We've created a comprehensive method specification in [did-vld.md](./did-vld.md) that defines:
+**Solution**: We've created a comprehensive method specification in [did-vld.md](https://bradleymatera.github.io/dids/methods/did-vld.html) that defines:
 
 - The method name as `vld`
 - The method-specific identifier as a 32-byte Blake3 hash of the Veilid public key, encoded as a base58btc string
@@ -19,7 +19,7 @@ The specification follows the W3C DID Core standard and includes all necessary c
 
 **Requirement**: Update the Cap'n Proto file to add a proof field, finalize enumerations, and bump the schema version to 1.0-rc1.
 
-**Solution**: We've updated the Cap'n Proto schema in [capnp-schema-update.md](../implementations/capnp-schema-update.md) with the following changes:
+**Solution**: We've updated the Cap'n Proto schema in [capnp-schema-update.md](https://bradleymatera.github.io/dids/implementations/capnp-schema-update.html) with the following changes:
 
 - Added a `proof` field to the `VeilidDIDDocument` struct to enable cryptographic verification
 - Finalized all enumerations including `VerificationMethodType`, `ServiceType`, `ProofType`, `ProofPurpose`, and `MessageType`
@@ -32,7 +32,7 @@ The updated schema ensures that all DID Documents include cryptographic proofs a
 
 **Requirement**: Write unit tests for the resolver that verify, given a Veilid keypair, you can publish a DID Document to the DHT, resolve it, and verify signatures on CirisMessages.
 
-**Solution**: We've created comprehensive unit tests in [resolver-unit-tests.md](../implementations/resolver-unit-tests.md) that verify:
+**Solution**: We've created comprehensive unit tests in [resolver-unit-tests.md](https://bradleymatera.github.io/dids/implementations/resolver-unit-tests.html) that verify:
 
 1. **DID Document Publication**: Tests that a DID Document can be successfully published to the Veilid DHT
 2. **DID Document Resolution**: Tests that a published DID Document can be resolved and its signature verified
@@ -45,7 +45,7 @@ The tests include all necessary setup code, test fixtures, and assertions to ens
 
 **Requirement**: Threat-model correlation risk across services like Discord and Weighted Authority voting channels by running deanonymization simulations with pairwise DID strategy enabled.
 
-**Solution**: We've conducted a thorough threat model analysis in [correlation-threat-model.md](../security/correlation-threat-model.md) that:
+**Solution**: We've conducted a thorough threat model analysis in [correlation-threat-model.md](https://bradleymatera.github.io/dids/security/correlation-threat-model.html) that:
 
 - Identifies potential adversary capabilities and attack vectors for correlation attacks
 - Implements a pairwise DID strategy where different DIDs are used for different relationships
@@ -59,7 +59,7 @@ The threat model demonstrates that properly implemented pairwise DIDs provide st
 
 **Requirement**: Document the key rotation and recovery flow in the "Security and Privacy Considerations" section.
 
-**Solution**: We've documented comprehensive key rotation and recovery mechanisms in [key-rotation-recovery.md](../security/key-rotation-recovery.md) that:
+**Solution**: We've documented comprehensive key rotation and recovery mechanisms in [key-rotation-recovery.md](https://bradleymatera.github.io/dids/security/key-rotation-recovery.html) that:
 
 - Defines the key rotation process, including transition periods for maintaining identity continuity
 - Outlines multiple recovery mechanisms including social recovery, backup keys, and recovery services
@@ -73,11 +73,11 @@ The documentation forms a closed loop that addresses the full lifecycle of crypt
 
 In addition to addressing the specific requirements, we've created several comprehensive documents that bring together all aspects of the did:vld method:
 
-1. [did-vld-summary.md](./did-vld-summary.md): A concise summary of the did:vld method, its features, and implementation details.
+1. [did-vld-summary.md](https://bradleymatera.github.io/dids/methods/did-vld-summary.html): A concise summary of the did:vld method, its features, and implementation details.
 
-2. [did-vld-complete-reference.md](./did-vld-complete-reference.md): A comprehensive reference that combines all components of the specification, implementation details, security considerations, and practical applications.
+2. [did-vld-complete-reference.md](https://bradleymatera.github.io/dids/methods/did-vld-complete-reference.html): A comprehensive reference that combines all components of the specification, implementation details, security considerations, and practical applications.
 
-3. [veilid-did-implementation.md](../implementations/veilid-did-implementation.md): A practical guide to implementing DIDs with Veilid, focusing on the technical aspects and code examples.
+3. [veilid-did-implementation.md](https://bradleymatera.github.io/dids/implementations/veilid-did-implementation.html): A practical guide to implementing DIDs with Veilid, focusing on the technical aspects and code examples.
 
 ## Conclusion
 
