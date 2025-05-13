@@ -1,5 +1,7 @@
 # Implementing DIDs with Veilid
 
+{% include navigation.md %}
+
 This document explains how our system creates and manages Decentralized Identifiers (DIDs) using the Veilid network, focusing on the `did:vld` method.
 
 ## Overview
