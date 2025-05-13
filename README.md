@@ -1,16 +1,20 @@
-# Decentralized Identifiers (DIDs) Documentation
+# Brad's Personal DIDs Research Repository
 
-This repository contains comprehensive documentation on Decentralized Identifiers (DIDs), covering theoretical foundations, implementation details, and practical applications.
+This repository contains Bradley Matera's comprehensive academic research on Decentralized Identifiers (DIDs), covering theoretical foundations, implementation methodologies, and practical applications.
 
-## Documentation Website
+## Research Website
 
-The documentation is organized for GitHub Pages and can be accessed at:
+The full research documentation is organized for academic reference and can be accessed at:
 
 [https://bradleymatera.github.io/dids/](https://bradleymatera.github.io/dids/)
 
-## Documentation Structure
+## Access Notice
 
-The documentation is organized into the following sections:
+This scholarly collection is primarily maintained for academic purposes. Access to certain advanced implementation details and research findings may require appropriate academic credentials or invitation. Please ensure proper citation when referencing this work in academic publications.
+
+## Research Structure
+
+The documentation is organized into the following scholarly sections:
 
 1. [Overview of DIDs](docs/overview/)
 2. [DID Methods and Trust Models](docs/methods/)
@@ -27,12 +31,12 @@ The documentation is organized into the following sections:
 
 ## About This Repository
 
-This repository serves as a comprehensive resource for understanding and implementing Decentralized Identifiers. The documentation is designed to be accessible to both newcomers and experienced practitioners in the decentralized identity space.
+This repository serves as a comprehensive academic resource for understanding and implementing Decentralized Identifiers. The content represents a synthesis of theoretical frameworks and practical implementations, with particular emphasis on emerging standards and innovative approaches in the decentralized identity ecosystem.
 
-## Contributing
+## Research Contributions
 
-Contributions to improve the documentation are welcome. Please feel free to submit pull requests or open issues to suggest improvements, corrections, or additions.
+This repository is continuously updated to reflect advancements in the field. Scholarly contributions and technical corrections from qualified researchers are welcomed through the appropriate academic channels.
 
 ## License
 
-This documentation is licensed under [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
+This research documentation is licensed under [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
