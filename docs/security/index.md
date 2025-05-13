@@ -60,6 +60,8 @@ The security of a DID ultimately depends on the security of the corresponding pr
 - Hardware security modules (HSMs)
 - Multi-signature schemes requiring multiple keys for critical operations
 
+For a detailed examination of key management challenges and solutions, see the [Key Rotation and Recovery](key-rotation-recovery.md) document, which provides comprehensive strategies for maintaining identity continuity while addressing key security concerns.
+
 ### Method-Specific Vulnerabilities
 
 Different DID methods have unique security properties and vulnerabilities:
@@ -100,6 +102,8 @@ DIDs aim to enhance privacy, but improper implementation can lead to correlation
 - **Pairwise DIDs**: Using different DIDs for different relationships.
 - **Zero-Knowledge Proofs**: Proving attributes without revealing the underlying data.
 - **Minimal Disclosure**: Sharing only necessary claims rather than entire credentials.
+
+For an in-depth analysis of correlation risks and a pairwise DID strategy implementation, see the [Correlation Threat Model](correlation-threat-model.md) document, which examines these issues in the context of the did:vld method.
 
 ### Data Sovereignty and Storage
 

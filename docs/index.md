@@ -1,56 +1,46 @@
-# Decentralized Identifiers (DIDs) with Veilid
+# Brad's Personal DIDs Research Repository
 
-Welcome to the comprehensive documentation on implementing Decentralized Identifiers (DIDs) using the Veilid network. This documentation covers the `did:vld` method specification, implementation details, security considerations, and practical applications.
+Welcome to Bradley Matera's comprehensive academic research on Decentralized Identifiers (DIDs). This repository contains extensive research on DIDs, their theoretical foundations, diverse implementation methodologies across various platforms, and practical applications in emerging digital ecosystems.
 
-## Navigation
+## Research Structure
 
-### Method Specification
+This documentation is systematically organized into the following key scholarly sections:
 
-- [did:vld Method Specification](./methods/did-vld.md) - Complete specification of the did:vld method
-- [did:vld Method Summary](./methods/did-vld-summary.md) - Concise summary of the did:vld method
-- [did:vld Complete Reference](./methods/did-vld-complete-reference.md) - Comprehensive reference for the did:vld method
-- [Task Completion Summary](./methods/task-completion-summary.md) - Overview of how requirements were addressed
+### Core Concepts and Overview
 
-### Implementation Details
+- [Overview of DIDs](./overview/) - Introduces the core concepts, architecture, and significance of Decentralized Identifiers in the context of digital identity
 
-- [Veilid DID Implementation](./implementations/veilid-did-implementation.md) - Practical guide to implementing DIDs with Veilid
-- [Cap'n Proto Schema Update](./implementations/capnp-schema-update.md) - Updates to the Cap'n Proto schema
-- [Resolver Unit Tests](./implementations/resolver-unit-tests.md) - Unit tests for the did:vld resolver
+### Methods and Implementations
 
-### Security and Privacy
+- [DID Methods and Trust Models](./methods/) - Explores various DID methods, their underlying mechanisms, and trust frameworks
+- [Implementation Guides](./implementations/) - Provides practical guidance and examples for developers
 
-- [Correlation Threat Model](./security/correlation-threat-model.md) - Analysis of correlation risks and pairwise DID strategy
-- [Key Rotation and Recovery](./security/key-rotation-recovery.md) - Documentation of key rotation and recovery mechanisms
+### Security and Future Directions
 
-## Overview
+- [Security and Privacy Considerations](./security/) - Analyzes security properties, vulnerabilities, and privacy-enhancing techniques
+- [Future Outlook](./future/) - Discusses ongoing research, emerging trends, and standardization efforts
 
-The `did:vld` method leverages the Veilid network to create a secure, private, and resilient foundation for decentralized identifiers. Key features include:
+### Applications and Adoption
 
-- **Method-Specific ID**: 32-byte Blake3 hash of the Veilid public key
-- **DHT-Based Resolution**: Uses Veilid's distributed hash table for lookup
-- **Cryptographic Verification**: All operations are cryptographically verifiable
-- **Privacy-Preserving**: Supports pairwise DIDs to prevent correlation
-- **Key Management**: Comprehensive rotation and recovery mechanisms
+- [Current Adoption Landscape](./adoption/) - Examines the current state of DID adoption across different industries
+- [Application Domains](./applications/) - Details specific use cases and implementations in various fields
 
-## Quick Start
 
-To get started with the `did:vld` method:
+## Key Concepts Covered
 
-1. Review the [did:vld Method Specification](./methods/did-vld.md) to understand the fundamentals
-2. Explore the [Veilid DID Implementation](./implementations/veilid-did-implementation.md) for practical implementation details
-3. Learn about security considerations in the [Correlation Threat Model](./security/correlation-threat-model.md) and [Key Rotation and Recovery](./security/key-rotation-recovery.md) documents
+This research delves into fundamental components of the DID ecosystem, including:
 
-## Security Considerations
+- **DID Syntax and Structure**: The standardized format of DID strings
+- **DID Documents**: JSON documents containing metadata associated with a DID
+- **DID Resolution**: The process of retrieving the DID Document associated with a DID
+- **DID Controllers**: Entities authorized to make changes to a DID Document
+- **Verifiable Credentials**: Tamper-evident digital credentials cryptographically signed by an issuer
+- **DID Registries**: Systems where DID Documents or references to them are stored
 
-The `did:vld` method includes several security and privacy features:
+## About This Repository
 
-- **Pairwise DIDs**: Different DIDs for different relationships to prevent correlation
-- **Cryptographic Proofs**: All operations require cryptographic verification
-- **Key Rotation**: Process for updating keys while maintaining identity continuity
-- **Recovery Mechanisms**: Multiple options for regaining control of a DID
+This repository serves as a dynamic and comprehensive academic resource for understanding, researching, and implementing Decentralized Identifiers. The content represents a synthesis of established theoretical frameworks, analysis of current standards (like W3C DID Core), and practical implementation insights, with particular emphasis on emerging standards, innovative approaches, and the evolving landscape of the decentralized identity ecosystem.
 
-## Implementation Status
+## License
 
-The `did:vld` method is currently at version 1.0-rc1 (release candidate 1), indicating that it's feature-complete and undergoing final testing before the official 1.0 release.
-
-With the implementation of the Cap'n Proto schema, resolver unit tests, and key rotation/recovery mechanisms, the `did:vld` method satisfies the cryptographic verifiability, privacy, and trust-model requirements while remaining lightweight enough for real-time agent needs.
+This research documentation is made available under the [Creative Commons Attribution 4.0 International License (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).

@@ -14,6 +14,7 @@ This document provides an in-depth overview of various Decentralized Identifier 
 - [did:pkh](#didpkh)
 - [did:sov and did:indy](#didsov-and-didindy)
 - [did:peer](#didpeer)
+- [did:vld](#didvld)
 - [Other Notable Methods](#other-notable-methods)
 - [Choosing the Right Method](#choosing-the-right-method)
 
@@ -194,6 +195,28 @@ did:peer is designed for direct, peer-to-peer scenarios where identities are gen
 did:peer is best for situations requiring transient or highly confidential identity exchanges, such as in secure messaging or localized applications.
 
 ---
+
+## did:vld
+
+**Overview:**  
+The did:vld method leverages the Veilid network, a privacy-focused distributed application platform, to create and manage DIDs. It uses Veilid's distributed hash table (DHT), cryptographic primitives, and decentralized architecture to provide a secure, private, and resilient foundation for decentralized identifiers.
+
+**Format Example:**  
+- `did:vld:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK`
+
+**Strengths:**  
+- **Decentralized Resolution:** Uses Veilid's DHT for resolving DIDs without central authorities.
+- **Cryptographic Verification:** Leverages Blake3 hashing and Veilid's cryptographic primitives for secure verification.
+- **Privacy-Preserving:** Supports pairwise DIDs to prevent correlation across contexts.
+- **Resilient:** Distributed storage ensures high availability and fault tolerance.
+- **Lightweight:** Efficient enough for real-time agent needs and resource-constrained devices.
+
+**Limitations:**  
+- **Ecosystem Dependency:** Relies on the Veilid network infrastructure for resolution.
+- **Emerging Standard:** As a newer method, it has a smaller ecosystem of tools and implementations compared to more established methods.
+
+*Additional Considerations:*  
+The did:vld method is particularly well-suited for applications requiring strong privacy guarantees and resilient decentralized infrastructure. For detailed specifications, see the [did:vld Method Specification](did-vld.md), [Summary](did-vld-summary.md), and [Complete Reference](did-vld-complete-reference.md).
 
 ## Other Notable Methods
 
