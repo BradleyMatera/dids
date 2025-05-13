@@ -6,7 +6,7 @@ This repository contains comprehensive documentation on Decentralized Identifier
 
 The documentation is organized for GitHub Pages and can be accessed at:
 
-[https://username.github.io/dids/](https://username.github.io/dids/)
+[https://bradleymatera.github.io/dids/](https://bradleymatera.github.io/dids/)
 
 ## Documentation Structure
 
