@@ -1,5 +1,7 @@
 # DID Implementation Guides
 
+{% include navigation.md %}
+
 This section provides detailed technical guides for implementing specific DID methods and integrating DIDs with various technologies. These guides focus on practical implementation details, code examples, and best practices that help developers transition from theoretical understanding to real-world applications.
 
 ## Available Implementation Guides

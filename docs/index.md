@@ -1,5 +1,7 @@
 # Brad's Personal DIDs Research Repository
 
+{% include navigation.md %}
+
 Welcome to Bradley Matera's comprehensive academic research on Decentralized Identifiers (DIDs). This repository contains extensive research on DIDs, their theoretical foundations, diverse implementation methodologies across various platforms, and practical applications in emerging digital ecosystems.
 
 ## Research Structure

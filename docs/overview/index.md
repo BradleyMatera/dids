@@ -1,5 +1,7 @@
 # Overview of Decentralized Identifiers (DIDs)
 
+{% include navigation.md %}
+
 Decentralized Identifiers (DIDs) represent a paradigm shift in digital identity management. Unlike traditional identifiers that rely on centralized authorities, DIDs are designed to be created, owned, and controlled by the identity subject without depending on central registration authorities, identity providers, or certificate authorities. This innovative approach empowers individuals and organizations to manage their identity data securely and privately, paving the way for a more user-centric and resilient digital ecosystem. By leveraging cryptographic techniques and decentralized architectures, DIDs enable a new era of trust and interoperability across diverse online interactions.
 
 ---
