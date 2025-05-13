@@ -1,5 +1,7 @@
 # DID Methods: Variants and Trust Models
 
+{% include navigation.md %}
+
 This document provides an in-depth overview of various Decentralized Identifier (DID) methods, detailing their structures, underlying trust models, use cases, advantages, limitations, and key implementation considerations. As decentralized identity solutions continue to evolve, understanding the nuances of each DID method is crucial for selecting the right approach based on application requirements such as privacy, scalability, cost, and security.
 
 ---

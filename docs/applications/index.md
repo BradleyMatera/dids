@@ -1,5 +1,7 @@
 # Decentralized Identifier (DID) Application Domains
 
+{% include navigation.md %}
+
 This section delves into the practical implementation and transformative potential of Decentralized Identifiers (DIDs) across a diverse range of application domains. As a foundational technology for self-sovereign identity (SSI) and verifiable data exchange, DIDs offer novel solutions to long-standing challenges in security, privacy, interoperability, and user control. The guides contained within this section provide detailed documentation, exploring domain-specific considerations, architectural patterns, implementation strategies, and concrete examples.
 
 ## Available Application Guides
