@@ -1,5 +1,7 @@
 # Education: Transforming Academic Credentials and Student Identity Management with DIDs
 
+{% include navigation.md %}
+
 Decentralized Identifiers (DIDs) and Verifiable Credentials (VCs) are poised to fundamentally revolutionize the education sector. They offer a secure, verifiable, portable, and student-centric framework for managing academic credentials and digital identities throughout the lifelong learning journey. This document explores the application of DIDs in educational contexts, detailing how they enhance security, dramatically reduce administrative friction and fraud, empower students with unprecedented control over their academic records, and foster a more interconnected global learning ecosystem.
 
 ---
