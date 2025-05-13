@@ -1,5 +1,7 @@
 # Secure Communications and Messaging with Decentralized Identifiers (DIDs)
 
+{% include navigation.md %}
+
 Decentralized Identifiers (DIDs) provide a robust foundation for secure communications and messaging systems. By leveraging cryptographic verification and decentralized identity management, DID-based messaging enables secure, private, and authenticated interactions without reliance on centralized authorities. This document explores the implementation, benefits, challenges, and future potential of using DIDs for secure messaging applications, offering a comprehensive guide for developers and organizations seeking to build trust-centric communication platforms.
 
 ---
