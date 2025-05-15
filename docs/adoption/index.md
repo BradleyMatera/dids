@@ -8,6 +8,7 @@ The adoption of Decentralized Identifiers (DIDs) has demonstrably grown beyond t
 
 ## Table of Contents
 
+- [Back to Front Page](../index.md)
 - [Overview: The Maturing DID Ecosystem](#overview-the-maturing-did-ecosystem)
 - [Major Implementations and Platforms](#major-implementations-and-platforms)
 - [Industry-Specific Adoption Trends](#industry-specific-adoption-trends)

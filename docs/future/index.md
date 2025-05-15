@@ -8,6 +8,7 @@ The landscape of decentralized identity is rapidly evolving, with Decentralized 
 
 ## Table of Contents
 
+- [Back to Front Page](../index.md)
 - [Technological Evolution: Advancing the Core of DIDs](#technological-evolution-advancing-the-core-of-dids)
 - [Integration with Emerging Technologies: Expanding Horizons](#integration-with-emerging-technologies-expanding-horizons)
 - [Standardization and Interoperability: Building a Cohesive Ecosystem](#standardization-and-interoperability-building-a-cohesive-ecosystem)
