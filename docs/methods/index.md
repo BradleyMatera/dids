@@ -8,6 +8,7 @@ This document provides an in-depth overview of various Decentralized Identifier 
 
 ## Table of Contents
 
+- [Back to Front Page](../index.md)
 - [did:web](#didweb)
 - [did:ion](#didion)
 - [did:ethr](#didethr)

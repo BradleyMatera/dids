@@ -8,6 +8,7 @@ Decentralized Identifiers (DIDs) represent a paradigm shift in digital identity 
 
 ## Table of Contents
 
+- [Back to Front Page](../index.md)
 - [Core Concepts](#core-concepts)
 - [DID Architecture](#did-architecture)
 - [Key Benefits](#key-benefits)
