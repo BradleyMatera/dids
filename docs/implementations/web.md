@@ -1,6 +1,6 @@
 # In-Depth Guide for did:web and WebRTC Integration
 
-{% include navigation.md %}
+
 
 This document provides a comprehensive overview of integrating `did:web`—a decentralized identifier method based on standard web infrastructure—with WebRTC to facilitate secure, peer-to-peer communication in web applications. It covers core concepts, protocols, practical implementation using JavaScript, HTML, and WebRTC APIs, and advanced considerations for building robust, scalable, and secure systems. Whether you're a developer building decentralized applications or an architect designing secure communication solutions, this guide offers actionable insights and code examples to help you leverage the power of decentralized identity in real-time web interactions.
 

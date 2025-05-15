@@ -1,6 +1,6 @@
 # did:vld Method: Complete Reference
 
-{% include navigation.md %}
+
 
 This document serves as a comprehensive reference for the `did:vld` method, bringing together all components of the specification, implementation details, security considerations, and practical applications. It provides a complete overview of how our system creates and manages Decentralized Identifiers (DIDs) using the Veilid network.
 

@@ -1,6 +1,6 @@
 # Threat Model: Correlation Risk Analysis
 
-{% include navigation.md %}
+
 
 This document presents a threat model analysis of correlation risks in the `did:vld` method, particularly focusing on potential deanonymization across different services like Discord and Weighted Authority voting channels. It also details how the pairwise DID strategy mitigates these risks.
 

@@ -1,6 +1,6 @@
 # Future Outlook for Decentralized Identifiers (DIDs)
 
-{% include navigation.md %}
+
 
 The landscape of decentralized identity is rapidly evolving, with Decentralized Identifiers (DIDs) at the forefront of this transformation. As a cornerstone of self-sovereign identity (SSI), DIDs promise to redefine how trust, privacy, and security are managed in digital interactions. This document explores emerging trends, potential developments, and the long-term trajectory of DID technology across various domains, offering insights into the challenges and opportunities that lie ahead.
 

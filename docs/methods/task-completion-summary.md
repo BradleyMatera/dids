@@ -1,6 +1,6 @@
 # Task Completion Summary
 
-{% include navigation.md %}
+
 
 This document summarizes how we've addressed each of the questions and requirements from the original task.
 

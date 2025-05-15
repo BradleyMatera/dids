@@ -1,6 +1,6 @@
 # Security Implications and Privacy Considerations
 
-{% include navigation.md %}
+
 
 Decentralized Identifiers (DIDs) introduce a paradigm shift in digital identity management, offering enhanced security and privacy compared to traditional centralized systems. However, they also present unique security challenges that must be addressed. This document explores the security implications and privacy considerations of DID implementations.
 
