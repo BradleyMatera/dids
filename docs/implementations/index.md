@@ -6,6 +6,7 @@ This section provides detailed technical guides for implementing specific DID me
 
 ## Available Implementation Guides
 
+- [Back to Front Page](../index.md)
 - **[did:web and WebRTC Integration](web.md)**  
   Learn how to implement the `did:web` method and integrate it with WebRTC for secure, real-time communication. This guide covers setting up a DID resolver using standard web infrastructure, configuring WebRTC connections for peer-to-peer communication, and handling cryptographic key management.
 

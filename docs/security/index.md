@@ -8,6 +8,7 @@ Decentralized Identifiers (DIDs) introduce a paradigm shift in digital identity 
 
 ## Table of Contents
 
+- [Back to Front Page](../index.md)
 - [Security Advantages of DIDs](#security-advantages-of-dids)
 - [Key Security Challenges](#key-security-challenges)
 - [Privacy Considerations](#privacy-considerations)

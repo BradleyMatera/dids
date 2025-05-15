@@ -8,13 +8,14 @@ This section delves into the practical implementation and transformative potenti
 
 Explore the specific ways DIDs are being applied in the following areas:
 
--   **[IoT Device Authentication and Lifecycle Management](iot.md)**: Addresses the unique challenges of securing and managing identities for potentially billions of connected devices. Explores how DIDs provide unique, persistent, and cryptographically verifiable identities for IoT devices, enabling secure onboarding, communication, data integrity, and end-of-life management in complex IoT ecosystems.
+- [Back to Front Page](../index.md)
+- **[IoT Device Authentication and Lifecycle Management](iot.md)**: Addresses the unique challenges of securing and managing identities for potentially billions of connected devices. Explores how DIDs provide unique, persistent, and cryptographically verifiable identities for IoT devices, enabling secure onboarding, communication, data integrity, and end-of-life management in complex IoT ecosystems.
 
--   **[AI Systems: Identity Validation, Provenance Tracking, and Multi-Agent Coordination](ai.md)**: Investigates the critical role of DIDs in establishing trust and accountability within increasingly autonomous and distributed AI systems. Covers assigning verifiable identities to AI agents, tracking the provenance of AI-generated content and models, and facilitating secure communication and collaboration in multi-agent environments.
+- **[AI Systems: Identity Validation, Provenance Tracking, and Multi-Agent Coordination](ai.md)**: Investigates the critical role of DIDs in establishing trust and accountability within increasingly autonomous and distributed AI systems. Covers assigning verifiable identities to AI agents, tracking the provenance of AI-generated content and models, and facilitating secure communication and collaboration in multi-agent environments.
 
--   **[Education: Academic Credentials and Student Identity Management](education.md)**: Details the revolution DIDs and Verifiable Credentials bring to academic credentialing. Focuses on issuing tamper-proof digital diplomas and transcripts, empowering students with control over their lifelong learning records, and streamlining verification processes for admissions and employment.
+- **[Education: Academic Credentials and Student Identity Management](education.md)**: Details the revolution DIDs and Verifiable Credentials bring to academic credentialing. Focuses on issuing tamper-proof digital diplomas and transcripts, empowering students with control over their lifelong learning records, and streamlining verification processes for admissions and employment.
 
--   **[Secure Communications and Messaging](secure-messaging.md)**: Examines how DIDs can enhance security, privacy, and trust in communication systems. Explores DID-based authentication for establishing secure channels, preventing phishing and spoofing, and enabling end-to-end encrypted messaging with verifiable identities for participants.
+- **[Secure Communications and Messaging](secure-messaging.md)**: Examines how DIDs can enhance security, privacy, and trust in communication systems. Explores DID-based authentication for establishing secure channels, preventing phishing and spoofing, and enabling end-to-end encrypted messaging with verifiable identities for participants.
 
 ## Overview of DID Applications
 
