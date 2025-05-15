@@ -1,6 +1,6 @@
 # Cap'n Proto Schema Update
 
-{% include navigation.md %}
+
 
 This document outlines the updates made to the Cap'n Proto schema file for the `did:vld` method implementation. The updates include adding a proof field, finalizing enumerations, and updating the schema version to 1.0-rc1.
 

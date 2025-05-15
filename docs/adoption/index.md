@@ -1,6 +1,6 @@
 # Current Adoption Landscape: Decentralized Identifiers (DIDs)
 
-{% include navigation.md %}
+
 
 The adoption of Decentralized Identifiers (DIDs) has demonstrably grown beyond theoretical exploration into practical implementation across various sectors. Organizations worldwide are increasingly recognizing the transformative potential of DIDs for enhancing digital security, bolstering user privacy, and empowering individuals with greater control over their online identities. This document provides a comprehensive overview of the current DID adoption landscape, highlighting key implementations, analyzing industry-specific trends, examining government initiatives, discussing standardization progress, and outlining the challenges and future prospects of this evolving technology.
 

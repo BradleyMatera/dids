@@ -1,6 +1,6 @@
 # did:vld Method Specification
 
-{% include navigation.md %}
+
 
 This document outlines the Veilid-based Decentralized Identifier (DID) method, known as `did:vld`. This method leverages the Veilid distributed network to create, resolve, and manage DIDs in a secure, private, and decentralized manner.
 

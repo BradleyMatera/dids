@@ -1,6 +1,6 @@
 # IoT Device Authentication and Lifecycle Management with Decentralized Identifiers (DIDs)
 
-{% include navigation.md %}
+
 
 Decentralized Identifiers (DIDs) offer a transformative approach for managing identities in Internet of Things (IoT) ecosystems. By assigning each device a unique, cryptographically verifiable identifier and publishing its corresponding DID Document, IoT systems can achieve unprecedented levels of security, streamlined provisioning, efficient lifecycle management, and interoperability across heterogeneous networks. This document explores how DIDs can be integrated into IoT environments to address critical challenges in device identity, authentication, and operational trust.
 

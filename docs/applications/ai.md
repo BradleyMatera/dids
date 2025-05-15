@@ -1,6 +1,6 @@
 # Decentralized Identifiers (DIDs) in AI Systems: Establishing Trust, Provenance, and Coordination
 
-{% include navigation.md %}
+
 
 Decentralized Identifiers (DIDs) are not merely transforming human and organizational digital identity; they are emerging as a critical infrastructure component for the burgeoning field of artificial intelligence (AI). As AI systems become increasingly autonomous, distributed, and collaborative, establishing verifiable identities and trust mechanisms becomes paramount. By assigning unique, cryptographically verifiable DIDs to individual AI agents, models, or even datasets, we can significantly enhance security, accountability, interoperability, and trustworthiness within complex AI ecosystems. This document provides a comprehensive exploration of how DIDs can be integrated into AI systems to manage identity validation, rigorously track the provenance of AI-generated outputs, enable secure multi-agent coordination, and address ethical considerations.
 
