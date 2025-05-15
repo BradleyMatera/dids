@@ -4,28 +4,45 @@
 
 Welcome to Bradley Matera's comprehensive academic research on Decentralized Identifiers (DIDs). This repository contains extensive research on DIDs, their theoretical foundations, diverse implementation methodologies across various platforms, and practical applications in emerging digital ecosystems.
 
-## Research Structure
+---
+
+## Table of Contents
+
+
+---
+
+## Table of Contents
 
 This documentation is systematically organized into the following key scholarly sections:
 
 ### Core Concepts and Overview
-
-- [Overview of DIDs](./overview/) - Introduces the core concepts, architecture, and significance of Decentralized Identifiers in the context of digital identity
+- [Overview of DIDs](./overview/index.md) - Introduces the core concepts, architecture, and significance of Decentralized Identifiers in the context of digital identity
 
 ### Methods and Implementations
-
-- [DID Methods and Trust Models](./methods/) - Explores various DID methods, their underlying mechanisms, and trust frameworks
-- [Implementation Guides](./implementations/) - Provides practical guidance and examples for developers
+- [DID Methods and Trust Models](./methods/index.md) - Explores various DID methods, their underlying mechanisms, and trust frameworks
+  - [did:vld Method Specification](./methods/did-vld.md)
+  - [did:vld Summary](./methods/did-vld-summary.md)
+  - [did:vld Complete Reference](./methods/did-vld-complete-reference.md)
+  - [Task Completion Summary](./methods/task-completion-summary.md)
+- [Implementation Guides](./implementations/index.md) - Provides practical guidance and examples for developers
+  - [Implementing DIDs with Veilid](./implementations/veilid-did-implementation.md)
+  - [Cap'n Proto Schema Update](./implementations/capnp-schema-update.md)
+  - [did:vld Resolver Unit Tests](./implementations/resolver-unit-tests.md)
+  - [In-Depth Guide for did:web and WebRTC Integration](./implementations/web.md)
 
 ### Security and Future Directions
-
-- [Security and Privacy Considerations](./security/) - Analyzes security properties, vulnerabilities, and privacy-enhancing techniques
-- [Future Outlook](./future/) - Discusses ongoing research, emerging trends, and standardization efforts
+- [Security and Privacy Considerations](./security/index.md) - Analyzes security properties, vulnerabilities, and privacy-enhancing techniques
+  - [Threat Model: Correlation Risk Analysis](./security/correlation-threat-model.md)
+  - [Key Rotation and Recovery Flow](./security/key-rotation-recovery.md)
+- [Future Outlook](./future/index.md) - Discusses ongoing research, emerging trends, and standardization efforts
 
 ### Applications and Adoption
-
-- [Current Adoption Landscape](./adoption/) - Examines the current state of DID adoption across different industries
-- [Application Domains](./applications/) - Details specific use cases and implementations in various fields
+- [Current Adoption Landscape](./adoption/index.md) - Examines the current state of DID adoption across different industries
+- [Application Domains](./applications/index.md) - Details specific use cases and implementations in various fields
+  - [DIDs in AI Systems](./applications/ai.md)
+  - [Education: Academic Credentials and Student Identity](./applications/education.md)
+  - [IoT Device Authentication and Lifecycle Management](./applications/iot.md)
+  - [Secure Communications and Messaging with DIDs](./applications/secure-messaging.md)
 
 
 ## Key Concepts Covered
