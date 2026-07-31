@@ -1,0 +1,39 @@
+name: Factual correction
+description: Report an incorrect, outdated, unsupported, or misleading claim.
+title: "[Correction]: "
+labels:
+  - documentation
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: Paste the published page URL.
+    validations:
+      required: true
+  - type: textarea
+    id: claim
+    attributes:
+      label: Exact claim
+      description: Quote the shortest text needed to identify the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong
+      description: Explain whether the claim is incorrect, outdated, unsupported, or missing context.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Primary source
+      description: Link the specification, official documentation, source, test, or artifact.
+    validations:
+      required: true
+  - type: textarea
+    id: replacement
+    attributes:
+      label: Proposed correction
+      description: Suggest replacement wording if possible.

@@ -1,0 +1,26 @@
+{% assign icon = include.name | default: "file" %}
+<svg class="icon icon-{{ icon }}" aria-hidden="true" viewBox="0 0 24 24">
+  {% case icon %}
+  {% when "home" %}<path d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>
+  {% when "compass" %}<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>
+  {% when "pulse" %}<path d="M3 12h4l2-6 4 12 2-6h6"/>
+  {% when "compare" %}<path d="M7 4v16M17 4v16M3 8l4-4 4 4M13 16l4 4 4-4"/>
+  {% when "shield" %}<path d="M12 3 4.5 6v5c0 4.8 3.2 8.2 7.5 10 4.3-1.8 7.5-5.2 7.5-10V6z"/><path d="m8.5 12 2.2 2.2 4.8-5"/>
+  {% when "grid" %}<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+  {% when "code" %}<path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 4l-4 16"/>
+  {% when "globe" %}<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>
+  {% when "network" %}<circle cx="12" cy="5" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="m11 7-5 9M13 7l5 9M7 18h10"/>
+  {% when "flask" %}<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M8 15h8"/>
+  {% when "check" %}<rect x="3" y="3" width="18" height="18" rx="3"/><path d="m7 12 3 3 7-7"/>
+  {% when "eye" %}<path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6"/><circle cx="12" cy="12" r="2.5"/>
+  {% when "rotate" %}<path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 8a7 7 0 0 1 11.4-2L20 8M4 16l2.5 2A7 7 0 0 0 18 16"/>
+  {% when "spark" %}<path d="m12 2 1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8zM19 17l.7 2.3L22 20l-2.3.7L19 23l-.7-2.3L16 20l2.3-.7z"/>
+  {% when "book" %}<path d="M4 4h5a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4zM20 4h-5a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h5z"/>
+  {% when "chip" %}<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 1v5M15 1v5M9 18v5M15 18v5M1 9h5M18 9h5M1 15h5M18 15h5"/><rect x="10" y="10" width="4" height="4"/>
+  {% when "message" %}<path d="M4 4h16v12H9l-5 4z"/><path d="M8 9h8M8 12h5"/>
+  {% when "signal" %}<path d="M5 19v-2M10 19v-6M15 19V9M20 19V5"/>
+  {% when "timeline" %}<path d="M5 3v18M5 6h8l2 2h4M5 12h5l2 2h7M5 18h8"/>
+  {% when "library" %}<path d="M4 4h4v16H4zM10 4h4v16h-4zM16 5l4-1 3 15-4 1z"/>
+  {% else %}<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5"/>
+  {% endcase %}
+</svg>

@@ -1,254 +1,247 @@
-# Implementing DIDs with Veilid
+---
+title: Veilid architecture for did:vld
+description: A component and data-flow review for evaluating Veilid as a DID state layer, including the guarantees the method must add itself.
+section: Veilid research track
+status: design
+source_path: docs/implementations/veilid-did-implementation.md
+---
 
+Veilid is an open-source peer-to-peer application framework with routed operations and distributed storage. That makes it an interesting substrate for a DID method, but Veilid is not itself a DID registry or resolver.
 
+<div class="callout warning">
+  <p><strong>Architecture review, not implementation guide:</strong> this repository does not contain the code described below. API details must be pinned to a specific Veilid release before a prototype is written.</p>
+</div>
 
-This document explains how our system creates and manages Decentralized Identifiers (DIDs) using the Veilid network, focusing on the `did:vld` method.
+## System boundaries
 
-## Overview
+The proposed system has five layers:
 
-Veilid provides an ideal foundation for DIDs due to its decentralized architecture, strong cryptographic primitives, and distributed hash table (DHT). Our implementation leverages these features to create a secure, private, and resilient DID method.
+| Layer | Responsibility |
+|---|---|
+| Application | Authentication, messaging, credentials, user consent, business policy |
+| DID API | Parse identifiers, expose create/resolve/update/deactivate, return typed results |
+| Method engine | Validate `did:vld` syntax, state transitions, authorization, and metadata |
+| Veilid adapter | Start/attach node, create/open records, get/set values, surface network errors |
+| Veilid network | Route operations and provide distributed record behavior |
 
-## How did:vld Works
+The method engine is the critical missing layer. It converts generic DHT behavior into deterministic DID lifecycle semantics.
 
-### Method-Specific ID Generation
+## Components
 
-The `did:vld` method uses a 32-byte Blake3 hash of the Veilid public key as its method-specific identifier. This approach provides several benefits:
+### Parser and identifier codec
 
-1. **Cryptographic Derivation**: The identifier is cryptographically derived from the public key, creating a verifiable link between the identifier and the key material.
+Responsibilities:
 
-2. **Collision Resistance**: Blake3's strong collision resistance ensures that different public keys will generate different identifiers.
+- strict DID syntax;
+- canonical method-specific encoding;
+- crypto-kind/version preservation;
+- conversion to or validation against the DHT lookup key;
+- length and character limits;
+- safe rejection before network access.
 
-3. **Fixed Length**: The 32-byte output provides a consistent identifier length regardless of the input key size.
+The codec must publish test vectors. Equivalent identifiers cannot resolve differently because two libraries decoded them differently.
 
-4. **Performance**: Blake3 is extremely fast, allowing for efficient identifier generation even on resource-constrained devices.
+### State codec
 
-The generation process follows these steps:
+Responsibilities:
 
-```
-1. Generate a Veilid keypair
-2. Extract the public key
-3. Compute the Blake3 hash of the public key
-4. Encode the hash using base58btc
-5. Prefix with "did:vld:" to form the complete DID
-```
+- canonical serialization;
+- schema version;
+- document representation;
+- sequence and previous-state link;
+- operation type;
+- authorization data;
+- size and collection limits.
 
-### DHT-Based Resolution
+The encoding can be JSON, deterministic CBOR, Cap’n Proto, or another format, but hashing and signing require exactly one canonical byte representation.
 
-The resolver for `did:vld` operates through the Veilid Distributed Hash Table (DHT):
+### Transition validator
 
-1. **Lookup Process**: When resolving a DID, the system extracts the method-specific identifier and uses it as a key to query the Veilid DHT.
+Given previous accepted state and candidate state, it decides whether the transition is valid.
 
-2. **Distributed Storage**: The DID Document is stored across multiple nodes in the Veilid network, providing redundancy and high availability.
+It checks:
 
-3. **Cryptographic Verification**: Upon retrieval, the DID Document's signature is verified using the public key to ensure authenticity.
+- DID and record binding;
+- monotonic version/sequence;
+- previous-state hash;
+- controller authorization;
+- allowed key and service changes;
+- recovery thresholds;
+- deactivation terminality;
+- algorithm and schema support.
 
-4. **Caching**: For performance optimization, resolved DID Documents can be cached locally with appropriate time-to-live values.
+This logic should be pure and heavily unit-tested. Network code should not contain policy branches that only run in production.
 
-The resolution flow is as follows:
+### Veilid adapter
 
-```
-1. Parse the DID to extract the method-specific identifier
-2. Query the Veilid DHT using the identifier as the key
-3. Retrieve the DID Document from the DHT
-4. Verify the document's cryptographic signature
-5. Return the validated DID Document
-```
+The adapter isolates version-specific APIs and returns method-level results:
 
-## Implementation Details
-
-### System Components
-
-Our implementation consists of several key components:
-
-1. **Veilid Core Integration**: Direct integration with the Veilid network for DHT operations and cryptographic functions.
-
-2. **DID Manager**: Handles the creation, updating, and deactivation of DIDs.
-
-3. **Resolver**: Implements the resolution process to retrieve DID Documents from the DHT.
-
-4. **Cryptographic Module**: Manages key generation, signing, and verification operations.
-
-5. **Storage Interface**: Provides abstraction for storing private keys and other sensitive data.
-
-### Key Management
-
-Secure key management is critical for the `did:vld` method:
-
-1. **Key Generation**: Uses Veilid's cryptographic primitives to generate secure keypairs.
-
-2. **Key Storage**: Private keys are stored in secure, encrypted storage with appropriate access controls.
-
-3. **Key Rotation**: Supports seamless key rotation while maintaining identity continuity.
-
-4. **Recovery Mechanisms**: Implements multiple recovery options including social recovery and backup keys.
-
-### Privacy Enhancements
-
-Our implementation includes several privacy-enhancing features:
-
-1. **Pairwise DIDs**: Generates different DIDs for different relationships to prevent correlation.
-
-2. **Minimal Disclosure**: DID Documents contain only necessary information.
-
-3. **Encrypted Storage**: All sensitive data in the DHT is encrypted.
-
-4. **Anonymous Resolution**: DHT queries are routed through multiple nodes to obscure the requester's identity.
-
-## Code Examples
-
-### Creating a did:vld Identifier
-
-```javascript
-// Example code for creating a did:vld identifier
-
-async function createVeilidDID() {
-  // Generate a new Veilid keypair
-  const keypair = await veilid.crypto.generateKeypair();
-  
-  // Extract the public key
-  const publicKey = keypair.publicKey;
-  
-  // Compute the Blake3 hash of the public key
-  const hash = await veilid.crypto.blake3(publicKey);
-  
-  // Encode the hash using base58btc
-  const encodedHash = base58btc.encode(hash);
-  
-  // Create the DID string
-  const did = `did:vld:${encodedHash}`;
-  
-  // Create a basic DID Document
-  const didDocument = {
-    "@context": [
-      "https://www.w3.org/ns/did/v1",
-      "https://w3id.org/veilid/v1"
-    ],
-    "id": did,
-    "verificationMethod": [{
-      "id": `${did}#primary`,
-      "type": "VeilidVerificationKey2023",
-      "controller": did,
-      "publicKeyMultibase": encodedHash
-    }],
-    "authentication": [
-      `${did}#primary`
-    ]
-  };
-  
-  // Sign the DID Document
-  const signature = await veilid.crypto.sign(
-    JSON.stringify(didDocument),
-    keypair.privateKey
-  );
-  
-  // Add the proof to the DID Document
-  didDocument.proof = {
-    "type": "VeilidSignature2023",
-    "created": new Date().toISOString(),
-    "verificationMethod": `${did}#primary`,
-    "proofPurpose": "assertionMethod",
-    "proofValue": base58btc.encode(signature)
-  };
-  
-  // Store the DID Document in the DHT
-  await veilid.dht.put(encodedHash, JSON.stringify(didDocument));
-  
-  return {
-    did,
-    didDocument,
-    keypair
-  };
+```ts
+interface VeilidRecordStore {
+  create(schema: RecordSchema): Promise<RecordHandle>;
+  open(key: TypedRecordKey): Promise<RecordHandle>;
+  read(handle: RecordHandle, subkey: number): Promise<Uint8Array | null>;
+  write(handle: RecordHandle, subkey: number, value: Uint8Array): Promise<void>;
+  close(handle: RecordHandle): Promise<void>;
 }
 ```
 
-### Resolving a did:vld Identifier
+This is pseudocode. It must be replaced with interfaces derived from the pinned Veilid SDK and verified against real nodes.
 
-```javascript
-// Example code for resolving a did:vld identifier
+### Resolver
 
-async function resolveVeilidDID(did) {
-  // Extract the method-specific identifier
-  const parts = did.split(':');
-  if (parts.length !== 3 || parts[0] !== 'did' || parts[1] !== 'vld') {
-    throw new Error('Invalid did:vld format');
-  }
-  
-  const methodSpecificId = parts[2];
-  
-  // Query the Veilid DHT
-  const result = await veilid.dht.get(methodSpecificId);
-  
-  if (!result) {
-    throw new Error('DID Document not found in DHT');
-  }
-  
-  // Parse the DID Document
-  const didDocument = JSON.parse(result);
-  
-  // Extract the proof and verification method
-  const { proof, verificationMethod } = didDocument;
-  
-  // Find the verification method referenced in the proof
-  const method = verificationMethod.find(vm => 
-    vm.id === proof.verificationMethod
-  );
-  
-  if (!method) {
-    throw new Error('Referenced verification method not found');
-  }
-  
-  // Verify the signature
-  const publicKey = base58btc.decode(method.publicKeyMultibase);
-  const signature = base58btc.decode(proof.proofValue);
-  
-  // Create a copy of the document without the proof for verification
-  const documentForVerification = { ...didDocument };
-  delete documentForVerification.proof;
-  
-  const isValid = await veilid.crypto.verify(
-    JSON.stringify(documentForVerification),
-    signature,
-    publicKey
-  );
-  
-  if (!isValid) {
-    throw new Error('DID Document signature verification failed');
-  }
-  
-  return didDocument;
-}
-```
+The resolver coordinates parse, fetch, validation, caching, and output. It must not leak raw Veilid errors directly to callers or turn every failure into `notFound`.
 
-## Integration with Applications
+Candidate categories:
 
-### Authentication Flow
+- `invalidDid`;
+- `methodNotSupported`;
+- `notFound`;
+- `temporarilyUnavailable`;
+- `invalidState`;
+- `deactivated`;
+- `representationNotSupported`;
+- internal failure with a non-sensitive correlation ID.
 
-Applications can use `did:vld` for authentication:
+## Candidate data flow
 
-1. **Challenge-Response**: The application generates a random challenge.
-2. The user signs the challenge with their private key.
-3. The application resolves the user's DID Document and verifies the signature.
-4. Upon successful verification, the user is authenticated.
+### Create
 
-### Secure Messaging
+1. The DID API validates requested controller and options.
+2. The identifier codec creates or derives the stable identifier.
+3. The Veilid adapter creates an appropriate record.
+4. The state codec serializes version-zero state.
+5. The method engine signs and validates the same bytes.
+6. The adapter publishes state.
+7. A separate read path resolves and revalidates it.
+8. Only then does the API return success and recovery material.
 
-The `did:vld` method integrates with secure messaging systems:
+### Resolve
 
-1. **DID-Based Addressing**: Messages are addressed to DIDs rather than traditional identifiers.
-2. **End-to-End Encryption**: Messages are encrypted using the recipient's public key.
-3. **Signature Verification**: Message signatures are verified using the sender's DID Document.
-4. **Non-Repudiation**: Cryptographic signatures provide proof of message origin.
+1. Parse and canonicalize the DID.
+2. Derive the record key with domain separation.
+3. Check a bounded cache without extending state beyond policy.
+4. Fetch candidate state.
+5. Enforce size before decoding nested content.
+6. Validate record binding, schema, authorization chain, and terminal state.
+7. Return DID Resolution metadata, DID document, and document metadata.
 
-### Verifiable Credentials
+### Update
 
-Our implementation supports verifiable credentials:
+1. Resolve fresh current state.
+2. Construct a candidate transition against its exact version.
+3. Sign with an authorization method permitted by current state.
+4. Write using the network's available concurrency controls.
+5. Read back and resolve.
+6. If two valid updates race, apply the specification's deterministic conflict rule or reject and retry.
 
-1. **Issuance**: Credentials are issued by signing claims with the issuer's private key.
-2. **Verification**: Recipients can verify credentials by resolving the issuer's DID.
-3. **Selective Disclosure**: Credentials support zero-knowledge proofs for privacy-preserving verification.
+### Deactivate
 
-## Conclusion
+Publish an authorized terminal state that contains only the method-required metadata. Resolvers must never accept an older active snapshot after seeing a valid deactivation.
 
-The `did:vld` method leverages Veilid's distributed architecture to provide a secure, private, and resilient foundation for decentralized identifiers. By using the Veilid DHT as a resolver and incorporating strong cryptographic proofs, this method enables verifiable digital identities while maintaining privacy through features like pairwise DIDs.
+## DHT design questions
 
-Our implementation satisfies the cryptographic verifiability, privacy, and trust-model requirements while remaining lightweight enough for real-time agent needs. The combination of Blake3 hashing for method-specific IDs and DHT-based resolution creates a robust system for managing digital identities in a decentralized environment.
+Before implementation, verify from current Veilid documentation and experiments:
+
+- Which DHT record schema best expresses authorized writers?
+- What are value and subkey size limits?
+- How are conflicting writes surfaced?
+- What ordering or timestamp information is reliable?
+- How durable are records without active maintainers?
+- Can old values reappear after partitions?
+- What confidentiality is provided by default record encryption, and from whom?
+- Which metadata remains observable to nodes or network observers?
+- How should clients recover after being offline across many updates?
+
+Answers must be tied to a Veilid version and test results.
+
+## Storage strategies
+
+### Signed latest snapshot
+
+Store one latest state envelope.
+
+**Advantages:** simple and bounded reads.
+
+**Risks:** rollback detection and history depend on external memory or network guarantees.
+
+### Append-only event chain
+
+Store signed operations linked by hashes.
+
+**Advantages:** auditable transitions and rollback evidence.
+
+**Risks:** unbounded history, discovery complexity, pruning, and fork handling.
+
+### Checkpoints plus recent events
+
+Store signed checkpoints and a bounded transition window.
+
+**Advantages:** balances resolution cost and history.
+
+**Risks:** more specification and migration complexity.
+
+The method should choose one. Implementations cannot safely invent their own history behavior.
+
+## Availability versus authenticity
+
+Signature verification can prove that retrieved state is authentic under prior state. It does not prove that the resolver received the **latest** state.
+
+Freshness requires some combination of:
+
+- monotonic state known to the client;
+- network consensus or conflict rules;
+- checkpoint witnesses;
+- cache age limits;
+- multiple retrieval paths;
+- explicit version queries;
+- application policy during uncertainty.
+
+This is one of the core research problems, not an implementation detail.
+
+## Privacy budget
+
+The architecture should record data exposure at every layer:
+
+| Data | Potential observer | Reduction strategy |
+|---|---|---|
+| Stable DID | Counterparties, logs, credentials | Pairwise identifiers where appropriate |
+| Record key | DHT participants and clients | Assess derivation and routed lookup behavior |
+| Update time | Network and application observers | Avoid unnecessary writes; test timing leakage |
+| Service endpoint | Anyone resolving public state | Omit or use relationship-specific endpoints |
+| Controller key | Resolvers and verifiers | Avoid reuse across unrelated identifiers |
+| IP/routing metadata | Depends on Veilid threat model | Validate private routing assumptions experimentally |
+
+No architecture diagram can replace measurement.
+
+## Failure policy
+
+Applications need explicit behavior for:
+
+- Veilid node not attached;
+- record unavailable;
+- invalid or conflicting state;
+- unsupported method version;
+- controller key compromise;
+- deactivated DID;
+- network partition;
+- local cache newer than fetched state;
+- migration to a newer Veilid or method version.
+
+For high-risk actions, uncertainty should fail closed. For low-risk read-only displays, a clearly labeled cached state may be acceptable.
+
+## Prototype milestone
+
+A valid prototype should be boring:
+
+- one CLI or library;
+- one pinned Veilid environment;
+- one cryptosystem;
+- one state encoding;
+- one writer;
+- no credentials or AI integration;
+- create, resolve, update, rotate, deactivate;
+- adversarial tests;
+- reproducible setup and CI.
+
+Only after that should the research expand to multi-controller recovery, private relationships, DIDComm, or application demos.

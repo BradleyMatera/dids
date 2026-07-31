@@ -1,0 +1,13 @@
+{
+  "name": "did-field-guide",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Validation tooling for the DID Field Guide.",
+  "scripts": {
+    "test": "node scripts/validate.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "CC-BY-4.0"
+}

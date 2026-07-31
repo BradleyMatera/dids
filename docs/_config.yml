@@ -1,4 +1,32 @@
-theme: jekyll-theme-cayman
-title: Decentralized Identifiers (DIDs) with Veilid
-description: Comprehensive documentation on implementing DIDs using the Veilid network
-include: [_includes]
+title: DID Field Guide
+description: A standards-first field guide to decentralized identifiers, method tradeoffs, security, and an experimental Veilid design.
+url: https://bradleymatera.github.io
+baseurl: /dids
+repository: BradleyMatera/dids
+author:
+  name: Bradley Matera
+  url: https://github.com/BradleyMatera
+lang: en-US
+timezone: UTC
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  hard_wrap: false
+permalink: pretty
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+      status: explainer
+      reviewed: "2026-07-31"
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor

@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Read the project status
+    url: https://bradleymatera.github.io/dids/status/
+    about: Check what is implemented, proposed, or missing before filing an issue.

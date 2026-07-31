@@ -1,0 +1,21 @@
+# DID Field Guide
+
+> Standards-first research on decentralized identifiers (DIDs), security, method selection, implementation patterns, and an experimental Veilid-backed method proposal.
+
+Important status note: `did:vld` is a research proposal in this repository. It is not a registered DID method, a Veilid Foundation specification, a working resolver, or production-ready software.
+
+## Primary paths
+
+- [Start here](https://bradleymatera.github.io/dids/)
+- [DIDs, clearly](https://bradleymatera.github.io/dids/overview/)
+- [Project status](https://bradleymatera.github.io/dids/status/)
+- [Compare DID methods](https://bradleymatera.github.io/dids/methods/)
+- [Security and privacy](https://bradleymatera.github.io/dids/security/)
+- [Implementation path](https://bradleymatera.github.io/dids/implementations/)
+- [did:vld proposal](https://bradleymatera.github.io/dids/methods/did-vld/)
+- [Standards tracker](https://bradleymatera.github.io/dids/future/)
+- [Sources and glossary](https://bradleymatera.github.io/dids/reference/)
+
+## Editorial policy
+
+Claims are separated into stable standards, active drafts, analysis, design proposals, and test plans. Conceptual code is not presented as a runnable implementation. Pages include a reviewed date and link to primary sources where practical.

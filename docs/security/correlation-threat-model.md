@@ -1,297 +1,157 @@
-# Threat Model: Correlation Risk Analysis
+---
+title: Correlation threat model
+description: A linkability analysis for public, pairwise, and Veilid-backed DIDs that replaces unsupported percentages with explicit observers, signals, and measurement requirements.
+section: Veilid research track
+status: analysis
+source_path: docs/security/correlation-threat-model.md
+---
 
+Correlation is the ability to infer that two interactions involve the same subject or controller. Changing the DID string can reduce one direct signal while leaving many others intact.
 
+<div class="callout danger">
+  <p><strong>There are no validated “less than 1%” results.</strong> The previous document reported precise correlation rates without a reproducible simulation, dataset, observer model, or source code. Those numbers have been removed.</p>
+</div>
 
-This document presents a threat model analysis of correlation risks in the `did:vld` method, particularly focusing on potential deanonymization across different services like Discord and Weighted Authority voting channels. It also details how the pairwise DID strategy mitigates these risks.
+## Privacy goal
 
-## 1. Introduction
+A useful goal is:
 
-Decentralized Identifiers (DIDs) provide a foundation for self-sovereign identity, but they can introduce privacy risks if not implemented carefully. One significant risk is correlation—the ability for observers to link a user's activities across different contexts, potentially deanonymizing them.
+> An observer of one relationship should not be able to link it to another relationship with meaningfully greater confidence than the stated baseline, except with information intentionally disclosed by the subject.
 
-## 2. Threat Scenario
+That goal needs a defined observer and baseline before it can be tested.
 
-### 2.1 Adversary Capabilities
+## Adversaries
 
-We assume an adversary with the following capabilities:
-- Access to public DID registries (the Veilid DHT)
-- Ability to observe DID usage patterns across multiple services
-- Ability to analyze metadata associated with DID operations
-- Potential control of one or more services where DIDs are used
+### Counterparty
 
-### 2.2 Attack Vectors
+One service sees the DID, keys, credentials, timing, device/application metadata, and network information exposed during its own interactions.
 
-The primary attack vectors for correlation include:
+### Colluding counterparties
 
-1. **Identifier Reuse**: Using the same DID across multiple services creates a direct link between different contexts.
+Two or more services compare identifiers, keys, credential claims, endpoints, timing, device fingerprints, and behavioral patterns.
 
-2. **Timing Analysis**: Even with different DIDs, if operations (creation, updates, resolutions) occur in predictable patterns, they can be correlated.
+### Registry or DHT observer
 
-3. **Metadata Leakage**: Information in DID Documents or associated with DID operations may contain linkable data.
+An observer sees some combination of record identifiers, lookups, writes, timing, size, routing, and participating nodes, depending on the network threat model.
 
-4. **Network-Level Correlation**: IP addresses or other network identifiers used when interacting with the DHT can be linked.
+### Global passive observer
 
-5. **Service Collusion**: Multiple services sharing information about their users' DIDs can correlate identities.
+An unusually powerful observer can monitor broad network timing and traffic patterns. A design should state whether this adversary is in or out of scope rather than implying universal anonymity.
 
-### 2.3 Potential Impact
+### Compromised wallet or application
 
-Successful correlation attacks could lead to:
-- Deanonymization of users across services
-- Tracking of user activities across different contexts
-- Profiling of user behavior and preferences
-- Loss of privacy and contextual integrity
-- Potential targeting of users based on their activities in other contexts
+The client itself can directly map every identifier, credential, key, and contact. Pairwise DIDs cannot protect against a fully compromised endpoint.
 
-## 3. Pairwise DID Strategy
+## Correlation signals
 
-To mitigate correlation risks, the `did:vld` method implements a pairwise DID strategy, where users generate and use different DIDs for different relationships or services.
+| Signal | Why it links | Possible reduction |
+|---|---|---|
+| Same DID | Exact stable identifier | Relationship-specific DIDs |
+| Same verification key | Cryptographic fingerprint | Unique keys per relationship |
+| Same service endpoint | Shared infrastructure marker | Omit, rotate, or use relationship-specific routing |
+| Same credential subject ID | Stable claim inside presentations | Pairwise subject identifiers or omit when unnecessary |
+| Same credential serial/status index | Issuance metadata | Privacy-preserving status and presentation design |
+| Unique claim combination | Quasi-identifiers | Data minimization and selective disclosure |
+| Update timing | Related identifiers change together | Avoid synchronized maintenance where feasible |
+| Lookup timing | Same client resolves related records | Private routing, caching, batching, or proxy strategies |
+| IP/device fingerprint | Endpoint metadata | Platform/network privacy controls |
+| Behavior and language | Repeated human pattern | Mostly outside DID-layer control |
 
-### 3.1 Implementation Approach
+## Single versus pairwise DIDs
 
-The pairwise DID strategy is implemented as follows:
+### One public DID
 
-1. **Unique DID per Relationship**: For each service or relationship, a unique DID is generated.
+All uses are directly linkable. This may be correct for a public organization, product, or service where discoverability is intentional.
 
-2. **Deterministic but Private Derivation**: DIDs can be deterministically derived from a master key and a service identifier, allowing the user to regenerate them without storing each one.
+### Pairwise DIDs with unique keys
 
-3. **No Shared Attributes**: DID Documents for different contexts contain no common or linkable attributes.
+Direct string and key equality are removed. This is better for private relationships, but correlation can continue through endpoints, credentials, timing, network data, or wallet telemetry.
 
-4. **Isolated Storage**: Each DID's data is stored separately in the DHT with no explicit links between them.
+### Pairwise DIDs with reused keys
 
-5. **Controlled Resolution Patterns**: Resolution requests are timed and routed to prevent timing correlation.
+Different DID strings provide weak privacy because the same public key becomes the stable link.
 
-### 3.2 Technical Implementation
+### Pairwise DIDs with a public parent
 
-```javascript
-// Example of pairwise DID generation
-async function generatePairwiseDID(masterKey, serviceIdentifier) {
-  // Derive a service-specific key using HMAC
-  const serviceSpecificSeed = await veilid.crypto.hmac(
-    masterKey,
-    Buffer.from(serviceIdentifier)
-  );
-  
-  // Generate a keypair from the service-specific seed
-  const keypair = await veilid.crypto.generateKeypairFromSeed(serviceSpecificSeed);
-  
-  // Create a DID using the standard did:vld method
-  const publicKeyHash = await veilid.crypto.blake3(keypair.publicKey);
-  const encodedHash = base58btc.encode(publicKeyHash);
-  const did = `did:vld:${encodedHash}`;
-  
-  return {
-    did,
-    keypair
-  };
-}
+If each pairwise DID publishes a relationship to one public controller, the parent restores linkability. Recovery and delegation designs need the same privacy review as active keys.
 
-// Usage example
-const masterKey = await veilid.crypto.generateSecretKey();
-const discordDID = await generatePairwiseDID(masterKey, 'discord');
-const votingDID = await generatePairwiseDID(masterKey, 'weighted-authority');
-```
+## did:vld-specific questions
 
-## 4. Deanonymization Simulation Results
+The Veilid proposal must test:
 
-To evaluate the effectiveness of the pairwise DID strategy, we conducted deanonymization simulations with various configurations.
+- whether DHT record keys are visible to routing participants;
+- whether repeated reads or writes are linkable to one node;
+- how private routing changes the observer model;
+- whether default record encryption hides content only or also access patterns;
+- whether a key-derived DID links to other uses of a Veilid public key;
+- whether update authorization reveals a common recovery controller;
+- how long records and routing metadata persist;
+- whether pairwise records have distinguishable size or timing.
 
-### 4.1 Simulation Setup
+These are questions for current Veilid documentation and experiments, not assumptions derived from the word “private.”
 
-The simulation included:
-- 1,000 simulated users
-- 5 different services (including Discord and Weighted Authority voting)
-- Various DID usage patterns and frequencies
-- Multiple correlation attack strategies
+## Minimum-disclosure design
 
-### 4.2 Simulation Scenarios
+1. Use a distinct DID and key material for each relationship when linkability is not required.
+2. Keep personal claims out of DID documents.
+3. Avoid globally reusable service endpoints.
+4. Do not place a universal subject ID inside every credential.
+5. Ask only for claims required by the transaction.
+6. Separate issuer trust from holder identity.
+7. Minimize resolver, application, crash, and analytics logs.
+8. Review push notifications, cloud backups, and device sync.
+9. Give users a clear explanation when an action creates a stable public identifier.
 
-We tested three primary scenarios:
+## Reproducible experiment design
 
-1. **Single DID**: Each user uses the same DID across all services.
-2. **Pairwise DIDs (Basic)**: Each user uses different DIDs for different services, but with no additional privacy measures.
-3. **Pairwise DIDs (Enhanced)**: Each user uses different DIDs with randomized access patterns and additional privacy enhancements.
+A valid experiment needs:
 
-### 4.3 Results
+### Hypothesis
 
-| Scenario | Correlation Success Rate | Notes |
-|----------|--------------------------|-------|
-| Single DID | 100% | Complete correlation was possible in all cases |
-| Pairwise DIDs (Basic) | 5-10% | Limited correlation through timing analysis and metadata |
-| Pairwise DIDs (Enhanced) | <1% | Near-complete resistance to correlation attempts |
+Example: “Under a local DHT observer that sees record operations but not endpoint IPs, relationship-specific records with randomized update schedules reduce classifier precision compared with a reused record.”
 
-### 4.4 Analysis of Attack Vectors
+### Dataset
 
-#### Identifier Reuse
-- **Single DID**: Trivial correlation through direct identifier matching
-- **Pairwise DIDs**: No correlation possible through direct identifier matching
+Document:
 
-#### Timing Analysis
-- **Single DID**: Not applicable (already correlated through identifiers)
-- **Pairwise DIDs (Basic)**: Moderate success in correlating through creation/usage patterns
-- **Pairwise DIDs (Enhanced)**: Minimal success due to randomized timing
+- number of simulated users and relationships;
+- interaction and update schedule;
+- network topology;
+- background traffic;
+- identifier/key/endpoint reuse;
+- missing and noisy observations.
 
-#### Metadata Leakage
-- **Single DID**: Additional confirmation through metadata
-- **Pairwise DIDs (Basic)**: Some correlation possible through similar service endpoints or verification methods
-- **Pairwise DIDs (Enhanced)**: Minimal correlation due to sanitized metadata
+### Baselines
 
-#### Network-Level Correlation
-- **Single DID**: Strong correlation through network identifiers
-- **Pairwise DIDs (Basic)**: Moderate correlation through network patterns
-- **Pairwise DIDs (Enhanced)**: Low correlation due to network path diversity
+Compare:
 
-## 5. Implementation Recommendations
+- random guessing;
+- majority-class guessing;
+- same-DID matching;
+- same-key matching;
+- timing-only classifier;
+- combined signals.
 
-Based on the simulation results, we recommend the following practices for implementing the pairwise DID strategy:
+### Metrics
 
-### 5.1 DID Generation and Management
+Report precision, recall, false-positive rate, ROC/PR curves where appropriate, confidence intervals, and results across repeated seeds. Do not publish one success percentage without class balance.
 
-1. **Deterministic Derivation**: Use a secure derivation method to generate different DIDs from a master key.
-2. **Secure Storage**: Store the master key securely, as it can regenerate all derived DIDs.
-3. **Minimal Correlation Data**: Avoid storing explicit links between different DIDs.
+### Reproducibility
 
-### 5.2 DID Document Design
+Publish code, configuration, seeds, dependency versions, raw or safely shareable derived data, and exact commands. State which real Veilid behaviors were measured and which were simulated.
 
-1. **Minimal Content**: Include only necessary information in DID Documents.
-2. **Unique Service Endpoints**: Use different service endpoints for each context.
-3. **Standardized Formats**: Use consistent formatting to avoid stylometric correlation.
+## Privacy acceptance criteria
 
-### 5.3 Network Considerations
+The proposal should not claim “strong privacy” until:
 
-1. **Randomized Timing**: Introduce random delays between DID operations.
-2. **Network Path Diversity**: Use different network paths for different DIDs when possible.
-3. **Batch Operations**: Group DHT operations to minimize distinctive patterns.
+- the observer model is explicit;
+- direct identifier and key reuse are eliminated in pairwise mode;
+- endpoint and credential linkability are tested;
+- network metadata is measured on a pinned Veilid version;
+- logs and client telemetry are included;
+- residual risks are explained in user-facing language;
+- results are independently repeatable.
 
-### 5.4 Service Integration
+## Practical conclusion
 
-1. **Context Isolation**: Ensure services cannot directly link DIDs from different contexts.
-2. **Selective Disclosure**: Use zero-knowledge proofs for cross-context authentication when needed.
-3. **User Education**: Inform users about the privacy benefits of pairwise DIDs.
-
-## 6. Practical Implementation
-
-The following code demonstrates a practical implementation of the pairwise DID strategy with enhanced privacy features:
-
-```javascript
-class PairwiseDIDManager {
-  constructor(masterKey) {
-    this.masterKey = masterKey;
-    this.didCache = new Map();
-  }
-  
-  async getDID(context) {
-    // Check if we already have a DID for this context
-    if (this.didCache.has(context)) {
-      return this.didCache.get(context);
-    }
-    
-    // Derive a context-specific key
-    const contextSeed = await veilid.crypto.hmac(
-      this.masterKey,
-      Buffer.from(context)
-    );
-    
-    // Generate a keypair from the context-specific seed
-    const keypair = await veilid.crypto.generateKeypairFromSeed(contextSeed);
-    
-    // Create a DID using the standard did:vld method
-    const publicKeyHash = await veilid.crypto.blake3(keypair.publicKey);
-    const encodedHash = base58btc.encode(publicKeyHash);
-    const did = `did:vld:${encodedHash}`;
-    
-    // Create a minimal DID Document
-    const didDocument = {
-      "@context": [
-        "https://www.w3.org/ns/did/v1",
-        "https://w3id.org/veilid/v1"
-      ],
-      "id": did,
-      "verificationMethod": [{
-        "id": `${did}#primary`,
-        "type": "VeilidVerificationKey2023",
-        "controller": did,
-        "publicKeyMultibase": base58btc.encode(keypair.publicKey)
-      }],
-      "authentication": [
-        `${did}#primary`
-      ]
-    };
-    
-    // Add a context-specific service endpoint if needed
-    if (this.getServiceEndpointForContext(context)) {
-      didDocument.service = [{
-        "id": `${did}#${context}`,
-        "type": this.getServiceTypeForContext(context),
-        "serviceEndpoint": this.getServiceEndpointForContext(context)
-      }];
-    }
-    
-    // Sign the DID Document
-    const documentBytes = Buffer.from(JSON.stringify(didDocument));
-    const signature = await veilid.crypto.sign(documentBytes, keypair.privateKey);
-    
-    // Add proof to the document
-    const documentWithProof = {
-      ...didDocument,
-      proof: {
-        type: "VeilidSignature2023",
-        created: new Date().toISOString(),
-        verificationMethod: `${did}#primary`,
-        proofPurpose: "assertionMethod",
-        proofValue: base58btc.encode(signature)
-      }
-    };
-    
-    // Publish to DHT with randomized delay to prevent timing analysis
-    const delay = Math.floor(Math.random() * 2000) + 1000; // 1-3 second delay
-    setTimeout(async () => {
-      const methodSpecificId = did.split(':')[2];
-      await veilid.dht.put(
-        methodSpecificId,
-        Buffer.from(JSON.stringify(documentWithProof))
-      );
-    }, delay);
-    
-    // Cache and return the DID information
-    const didInfo = {
-      did,
-      keypair,
-      document: documentWithProof
-    };
-    
-    this.didCache.set(context, didInfo);
-    return didInfo;
-  }
-  
-  getServiceTypeForContext(context) {
-    // Return appropriate service type based on context
-    switch (context) {
-      case 'discord':
-        return 'VeilidMessaging';
-      case 'weighted-authority':
-        return 'VeilidCredentialService';
-      default:
-        return 'VeilidService';
-    }
-  }
-  
-  getServiceEndpointForContext(context) {
-    // Return appropriate service endpoint based on context
-    switch (context) {
-      case 'discord':
-        return `veilid://messaging/${context}-${Date.now()}`;
-      case 'weighted-authority':
-        return `veilid://credentials/${context}-${Date.now()}`;
-      default:
-        return null;
-    }
-  }
-}
-```
-
-## 7. Conclusion
-
-The pairwise DID strategy significantly reduces correlation risks across different services. Our simulations demonstrate that properly implemented pairwise DIDs with enhanced privacy measures can reduce the success rate of correlation attacks to less than 1%, effectively preventing deanonymization.
-
-By implementing the recommendations outlined in this document, the `did:vld` method can provide strong privacy guarantees while maintaining the benefits of decentralized identifiers. This approach ensures that users can interact with multiple services without sacrificing their privacy or enabling unwanted tracking.
-
-The combination of pairwise DIDs, randomized timing, metadata minimization, and network path diversity creates a robust defense against correlation attacks, making the `did:vld` method suitable for privacy-sensitive applications and contexts.
+Pairwise DIDs are a useful structural control against direct identifier reuse. They are not a quantitative privacy guarantee. The correct claim today is that `did:vld` **could be designed to support relationship-specific identifiers**, while its end-to-end correlation resistance remains unmeasured.

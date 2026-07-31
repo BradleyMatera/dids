@@ -1,54 +1,95 @@
-# Brad's Personal DIDs Research Repository
+# DID Field Guide
 
-This repository contains Bradley Matera's comprehensive academic research on Decentralized Identifiers (DIDs). DIDs are a new type of identifier that enables verifiable, decentralized digital identity. They are designed to be globally unique, resolvable with high availability, and cryptographically verifiable. This research covers their theoretical foundations, diverse implementation methodologies across various platforms, and practical applications in emerging digital ecosystems.
+A standards-first field guide to decentralized identifiers (DIDs), method tradeoffs, security, implementation patterns, and an experimental Veilid-backed DID method proposal.
 
-## Research Website
+**Read the published guide:** [bradleymatera.github.io/dids](https://bradleymatera.github.io/dids/)
 
-The full research documentation, meticulously organized for academic reference and detailed study, can be accessed via the dedicated research website:
+## Start here
 
-[https://bradleymatera.github.io/dids/](https://bradleymatera.github.io/dids/)
+- [DIDs, clearly](https://bradleymatera.github.io/dids/overview/) — the core model in ten minutes
+- [Project status](https://bradleymatera.github.io/dids/status/) — what exists, what is proposed, and what is missing
+- [Compare DID methods](https://bradleymatera.github.io/dids/methods/) — trust and lifecycle tradeoffs
+- [Security and privacy](https://bradleymatera.github.io/dids/security/) — threats and deployment controls
+- [`did:vld` proposal](https://bradleymatera.github.io/dids/methods/did-vld/) — the experimental Veilid research track
 
-This site provides a structured and navigable interface to the complete body of research presented herein.
+## Important project status
 
-## Access Notice
+`did:vld` is a research proposal. It is:
 
-This scholarly collection is primarily maintained for academic and research purposes. Access to certain advanced implementation details, experimental findings, and in-depth analyses may require appropriate academic credentials or explicit invitation. Researchers and practitioners are reminded to ensure proper citation standards are followed when referencing this work in academic papers, technical reports, or other publications.
+- not listed in the W3C DID Methods registry as of July 31, 2026;
+- not an official Veilid Foundation specification;
+- not implemented by a resolver in this repository;
+- not supported by executable DHT integration tests here;
+- not production-ready.
 
-## Research Structure
+The repository contains documentation, design analysis, a schema sketch, and a resolver test plan. See the [full evidence inventory](https://bradleymatera.github.io/dids/status/).
 
-The documentation is systematically organized into the following key scholarly sections, each exploring a critical facet of DIDs:
+## Why the repository was rebuilt
 
-1.  **[Overview of DIDs](docs/overview/)**: Introduces the core concepts, architecture, and significance of Decentralized Identifiers in the context of digital identity.
-2.  **[DID Methods and Trust Models](docs/methods/)**: Explores the variety of DID methods (e.g., `did:key`, `did:web`, `did:ion`, `did:ethr`), their underlying mechanisms, and the trust frameworks they enable.
-3.  **[Security and Privacy Considerations](docs/security/)**: Analyzes the security properties, potential vulnerabilities, and privacy-enhancing techniques associated with DID implementations.
-4.  **[Future Outlook](docs/future/)**: Discusses ongoing research, emerging trends, potential future developments, and standardization efforts within the DID ecosystem.
-5.  **[Current Adoption Landscape](docs/adoption/)**: Examines the current state of DID adoption across different industries, consortia, and open-source communities.
-6.  **[Application Domains](docs/applications/)**: Details specific use cases and implementations of DIDs in various fields:
-    *   [IoT Device Authentication](docs/applications/iot.md): Securing device identities and interactions in the Internet of Things.
-    *   [AI Systems Integration](docs/applications/ai.md): Establishing verifiable identities for AI agents and systems.
-    *   [Education and Academic Credentials](docs/applications/education.md): Issuing and verifying digital academic records and achievements.
-    *   [Secure Communications](docs/applications/secure-messaging.md): Enhancing trust and security in messaging and communication platforms.
-7.  **[Implementation Guides](docs/implementations/)**: Provides practical guidance and examples for developers:
-    *   [did:web and WebRTC Integration](docs/implementations/web.md): Implementing DIDs using web infrastructure and integrating with real-time communication protocols.
+The original documentation mixed established standards, conceptual examples, and unimplemented Veilid work. Several pages described imagined tests and privacy results as completed engineering. The 2026 overhaul:
 
-## Key Concepts Covered
+- separates standards, drafts, analysis, proposals, designs, and test plans;
+- removes unsupported metrics and production-readiness claims;
+- consolidates duplicated `did:vld` pages;
+- uses current primary sources;
+- replaces the default GitHub Pages theme with a responsive documentation system;
+- adds structured navigation, full-text search, page outlines, source metadata, dark/light themes, and accessible mobile behavior;
+- keeps GitHub as the source and contribution layer instead of using repository links as the site's information architecture.
 
-This research delves into fundamental components of the DID ecosystem, including:
-*   **DID Syntax and Structure**: The standardized format of DID strings.
-*   **DID Documents**: JSON documents containing metadata associated with a DID, such as cryptographic keys and service endpoints.
-*   **DID Resolution**: The process of retrieving the DID Document associated with a DID.
-*   **DID Controllers**: Entities authorized to make changes to a DID Document.
-*   **Verifiable Credentials (VCs)**: Tamper-evident digital credentials cryptographically signed by an issuer, often utilizing DIDs for issuer and subject identification.
-*   **DID Registries**: Systems (often blockchains or distributed ledgers) where DID Documents or references to them are stored.
+## Documentation map
 
-## About This Repository
+```text
+docs/
+├── overview/          Core DID mental model
+├── methods/           Method comparison and did:vld proposal
+├── security/          Threat model, correlation, rotation, recovery
+├── implementations/   Build path, WebRTC pattern, Veilid design, test plan
+├── applications/      AI, education, IoT, and secure messaging
+├── adoption/          Current deployment reality
+├── future/            Standards tracker and outlook
+├── reference/         Primary sources and glossary
+├── status/            Evidence and maturity inventory
+├── _layouts/          Jekyll page templates
+├── _includes/         Shared navigation, icons, and footer
+├── _data/             Central navigation model
+└── assets/            Design system and client-side behavior
+```
 
-This repository serves as a dynamic and comprehensive academic resource for understanding, researching, and implementing Decentralized Identifiers. The content represents a synthesis of established theoretical frameworks, analysis of current standards (like W3C DID Core), and practical implementation insights, with particular emphasis on emerging standards, innovative approaches, and the evolving landscape of the decentralized identity ecosystem. It aims to be a living document, updated as the technology matures.
+## Local validation
 
-## Research Contributions
+The published site is built by GitHub Pages from `docs/`.
 
-This repository is continuously updated to reflect the rapid advancements and ongoing discourse in the field of decentralized identity. Scholarly contributions, technical corrections, suggestions for expansion, and collaborative inquiries from qualified researchers and practitioners are welcomed through appropriate academic channels or repository issue tracking. Current areas of focus include interoperability challenges and advanced cryptographic techniques for privacy preservation.
+Run the repository checks:
+
+```bash
+npm test
+```
+
+For a Jekyll preview, install Ruby and Bundler, then:
+
+```bash
+bundle install
+bundle exec jekyll serve --source docs --baseurl /dids
+```
+
+Open `http://127.0.0.1:4000/dids/`.
+
+## Contributing
+
+Factual corrections are welcome. Include the exact page and claim, a primary source, the source's publication/status date, and a proposed correction.
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. Use the issue templates for factual corrections or `did:vld` research proposals.
+
+## Primary references
+
+- [W3C DID Core 1.0](https://www.w3.org/TR/did-core/)
+- [W3C DID Core 1.1](https://www.w3.org/TR/did-1.1/)
+- [W3C DID Resolution](https://www.w3.org/TR/did-resolution/)
+- [W3C DID Methods](https://www.w3.org/TR/did-extensions-methods/)
+- [W3C Verifiable Credentials Data Model 2.0](https://www.w3.org/TR/vc-data-model-2.0/)
+- [Veilid](https://veilid.com/)
+- [Veilid source](https://gitlab.com/veilid/veilid)
 
 ## License
 
-This research documentation is made available under the [Creative Commons Attribution 4.0 International License (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/). This license permits sharing and adaptation of the material for any purpose, including commercially, provided appropriate credit is given, a link to the license is provided, and any changes made are indicated.
+The research and documentation are licensed under [Creative Commons Attribution 4.0 International](LICENSE.md). Code used to render or validate the site is available under the same repository license unless a file states otherwise.

@@ -1,0 +1,41 @@
+name: did:vld research proposal
+description: Propose a reviewable change to the experimental Veilid-backed method.
+title: "[did:vld]: "
+labels:
+  - research
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Which method requirement or implementation risk does this address?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Describe the state, authorization, encoding, resolution, or lifecycle change precisely.
+    validations:
+      required: true
+  - type: input
+    id: veilid
+    attributes:
+      label: Veilid version or source
+      description: Link the current upstream API or behavior this proposal depends on.
+    validations:
+      required: true
+  - type: textarea
+    id: security
+    attributes:
+      label: Security and privacy impact
+      description: State assumptions, new threats, and residual risks.
+    validations:
+      required: true
+  - type: textarea
+    id: tests
+    attributes:
+      label: Tests and evidence
+      description: List test vectors, negative cases, integration evidence, or experiments required.
+    validations:
+      required: true

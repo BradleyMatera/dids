@@ -1,516 +1,211 @@
-# did:vld Resolver Unit Tests
+---
+title: did:vld resolver test plan
+description: The unit, integration, adversarial, privacy, and interoperability evidence required before claiming that a Veilid-backed DID resolver works.
+section: Veilid research track
+status: test-plan
+source_path: docs/implementations/resolver-unit-tests.md
+---
 
+This page defines tests that a future resolver **must pass**. There is no executable resolver test suite in this repository today.
 
+<div class="callout danger">
+  <p><strong>Correction:</strong> the earlier page presented imagined JavaScript tests as completed evidence and concluded the method was production-ready. Pseudocode cannot establish that a real Veilid DHT publication, resolution, or signature round trip occurred.</p>
+</div>
 
-This document outlines the unit tests for the `did:vld` resolver, which is responsible for retrieving and verifying DID Documents from the Veilid Distributed Hash Table (DHT). These tests ensure that the resolver functions correctly and securely.
+## Test layers
 
-## Overview
+| Layer | Dependency | Proves |
+|---|---|---|
+| Parser unit tests | None | Strict syntax and canonical identifier behavior |
+| State unit tests | None | Deterministic transition and authorization logic |
+| Codec tests | None | Stable bytes, bounds, and version handling |
+| Adapter contract tests | Fake + real Veilid adapter | Network error mapping and resource lifecycle |
+| Integration tests | Isolated real Veilid nodes | Actual create/read/update/deactivate behavior |
+| Interoperability tests | Independent implementation | Specification is not tied to one codebase |
+| Adversarial tests | Fault injection | Rejection of malicious, stale, and conflicting state |
+| Privacy experiments | Defined observer model | Measured metadata exposure under stated conditions |
 
-The resolver unit tests verify that given a Veilid keypair, the system can:
-1. Publish a DID Document to the DHT
-2. Resolve the DID Document from the DHT
-3. Verify signatures on CirisMessages during round-trip communication
+## Parser matrix
 
-These tests are essential for ensuring the reliability and security of the `did:vld` method implementation.
+Accept only canonical identifiers defined by the future grammar.
 
-## Test Environment Setup
+Reject:
 
-Before running the tests, the following components need to be set up:
+- wrong scheme or method case;
+- empty suffix;
+- whitespace and control characters;
+- forbidden percent-encoding;
+- non-canonical base encodings;
+- incorrect decoded length;
+- unsupported crypto-kind/version;
+- trailing path/query/fragment where the API accepts only a DID;
+- oversized input;
+- visually confusable but byte-distinct forms.
 
-1. **Veilid Node**: A local Veilid node for DHT operations
-2. **Test Keypairs**: Generated Veilid keypairs for testing
-3. **Mock DHT**: For isolated testing without network dependencies
+Property-based tests should generate valid and invalid strings and prove parse/serialize round trips.
 
-### Test Dependencies
+## Create tests
 
-```javascript
-// Required dependencies
-const veilid = require('veilid');
-const blake3 = require('blake3');
-const base58btc = require('base58-universal');
-const { expect } = require('chai');
-```
+### Success
 
-### Test Fixtures
+- Generates valid controller material.
+- Creates the intended DHT record schema.
+- Publishes canonical version-zero state.
+- Reads the state through a second client.
+- Resolves an identical DID document.
+- Returns recovery material only to the creator.
 
-```javascript
-// Common test fixtures
-let testKeypair;
-let testDID;
-let testDIDDocument;
+### Failure
 
-// Setup function to initialize test fixtures
-async function setupTestFixtures() {
-  // Initialize Veilid node
-  await veilid.init({
-    mode: 'test',
-    logLevel: 'error'
-  });
-  
-  // Generate a test keypair
-  testKeypair = await veilid.crypto.generateKeypair();
-  
-  // Create a DID from the keypair
-  const publicKeyHash = await blake3.hash(testKeypair.publicKey);
-  const encodedHash = base58btc.encode(publicKeyHash);
-  testDID = `did:vld:${encodedHash}`;
-  
-  // Create a basic DID Document
-  testDIDDocument = {
-    "@context": [
-      "https://www.w3.org/ns/did/v1",
-      "https://w3id.org/veilid/v1"
-    ],
-    "id": testDID,
-    "verificationMethod": [{
-      "id": `${testDID}#primary`,
-      "type": "VeilidVerificationKey2023",
-      "controller": testDID,
-      "publicKeyMultibase": base58btc.encode(testKeypair.publicKey)
-    }],
-    "authentication": [
-      `${testDID}#primary`
-    ],
-    "assertionMethod": [
-      `${testDID}#primary`
-    ]
-  };
-}
-```
+- Network unavailable before record creation.
+- Write rejected or times out.
+- Read-back differs from published bytes.
+- Identifier does not bind to record.
+- Initial document contains unsupported key types.
+- Partial create is cleaned up or reported for recovery.
+- Duplicate create cannot replace existing authorized state.
 
-## Test Cases
+## Resolution tests
 
-### Test 1: Publishing a DID Document to the DHT
+### Success
 
-This test verifies that a DID Document can be successfully published to the Veilid DHT.
+- Resolves current state.
+- Returns DID Resolution and document metadata.
+- Uses cache within the specified freshness window.
+- Fetches fresh state after invalidation.
+- Supports the required representation.
 
-```javascript
-describe('DID Document Publication', () => {
-  before(async () => {
-    await setupTestFixtures();
-  });
-  
-  it('should publish a DID Document to the DHT', async () => {
-    // Sign the DID Document
-    const documentBytes = Buffer.from(JSON.stringify(testDIDDocument));
-    const signature = await veilid.crypto.sign(documentBytes, testKeypair.privateKey);
-    
-    // Add proof to the document
-    const documentWithProof = {
-      ...testDIDDocument,
-      proof: {
-        type: "VeilidSignature2023",
-        created: new Date().toISOString(),
-        verificationMethod: `${testDID}#primary`,
-        proofPurpose: "assertionMethod",
-        proofValue: base58btc.encode(signature)
-      }
-    };
-    
-    // Extract the method-specific ID
-    const methodSpecificId = testDID.split(':')[2];
-    
-    // Publish to DHT
-    const result = await veilid.dht.put(
-      methodSpecificId,
-      Buffer.from(JSON.stringify(documentWithProof))
-    );
-    
-    // Verify successful publication
-    expect(result).to.have.property('success', true);
-    expect(result).to.have.property('key').that.equals(methodSpecificId);
-  });
-});
-```
+### Failure
 
-### Test 2: Resolving a DID Document from the DHT
+- Invalid DID returns `invalidDid` without network access.
+- Missing record returns `notFound`.
+- Network outage is distinguishable from not found.
+- Oversized state is rejected before full decode.
+- Document `id` mismatch is rejected.
+- Invalid signature is rejected.
+- Unknown mandatory version is rejected.
+- Stale/rollback state is rejected when newer state is known.
+- Deactivated state returns no active DID document.
 
-This test verifies that a published DID Document can be successfully resolved from the Veilid DHT.
+## Update tests
 
-```javascript
-describe('DID Document Resolution', () => {
-  let publishedDocument;
-  
-  before(async () => {
-    await setupTestFixtures();
-    
-    // Sign and publish the document
-    const documentBytes = Buffer.from(JSON.stringify(testDIDDocument));
-    const signature = await veilid.crypto.sign(documentBytes, testKeypair.privateKey);
-    
-    publishedDocument = {
-      ...testDIDDocument,
-      proof: {
-        type: "VeilidSignature2023",
-        created: new Date().toISOString(),
-        verificationMethod: `${testDID}#primary`,
-        proofPurpose: "assertionMethod",
-        proofValue: base58btc.encode(signature)
-      }
-    };
-    
-    // Extract the method-specific ID
-    const methodSpecificId = testDID.split(':')[2];
-    
-    // Publish to DHT
-    await veilid.dht.put(
-      methodSpecificId,
-      Buffer.from(JSON.stringify(publishedDocument))
-    );
-  });
-  
-  it('should resolve a DID Document from the DHT', async () => {
-    // Extract the method-specific ID
-    const methodSpecificId = testDID.split(':')[2];
-    
-    // Resolve from DHT
-    const result = await veilid.dht.get(methodSpecificId);
-    
-    // Parse the resolved document
-    const resolvedDocument = JSON.parse(result.toString());
-    
-    // Verify the resolved document matches the published document
-    expect(resolvedDocument).to.deep.equal(publishedDocument);
-    expect(resolvedDocument.id).to.equal(testDID);
-    expect(resolvedDocument.verificationMethod[0].controller).to.equal(testDID);
-  });
-  
-  it('should verify the signature on the resolved document', async () => {
-    // Extract the method-specific ID
-    const methodSpecificId = testDID.split(':')[2];
-    
-    // Resolve from DHT
-    const result = await veilid.dht.get(methodSpecificId);
-    
-    // Parse the resolved document
-    const resolvedDocument = JSON.parse(result.toString());
-    
-    // Extract the proof
-    const { proof, ...documentWithoutProof } = resolvedDocument;
-    
-    // Get the verification method
-    const verificationMethod = resolvedDocument.verificationMethod.find(
-      vm => vm.id === proof.verificationMethod
-    );
-    
-    // Decode the public key and signature
-    const publicKey = base58btc.decode(verificationMethod.publicKeyMultibase);
-    const signature = base58btc.decode(proof.proofValue);
-    
-    // Verify the signature
-    const isValid = await veilid.crypto.verify(
-      Buffer.from(JSON.stringify(documentWithoutProof)),
-      signature,
-      publicKey
-    );
-    
-    // Check that verification succeeded
-    expect(isValid).to.be.true;
-  });
-});
-```
+- Current controller may perform an allowed update.
+- A key listed only in the candidate new state cannot self-authorize.
+- A key not in the current authorization relationship fails.
+- Modified signed bytes fail.
+- Wrong previous-state hash fails.
+- Replayed sequence fails.
+- Skipped or duplicate sequence follows the specified rule.
+- Two concurrent updates produce a deterministic result or explicit conflict.
+- Update read-back matches resolved state.
+- Removed keys no longer authorize later changes.
 
-### Test 3: Verifying Signatures on CirisMessages
+## Rotation tests
 
-This test verifies that signatures on CirisMessages can be properly verified during round-trip communication.
+- Add-new, overlap, and remove-old sequence succeeds.
+- New key is not trusted before the authorized transition.
+- Old key stops working at the specified state.
+- Compromise rotation follows a distinct emergency policy if defined.
+- Cached pre-rotation state expires within the documented maximum.
+- Rotation does not change the DID if stability is promised.
+- Unsupported algorithm migration fails safely.
 
-```javascript
-describe('CirisMessage Signature Verification', () => {
-  let senderKeypair;
-  let senderDID;
-  let senderDIDDocument;
-  let receiverKeypair;
-  let receiverDID;
-  
-  before(async () => {
-    await setupTestFixtures();
-    
-    // Use the test fixtures for the sender
-    senderKeypair = testKeypair;
-    senderDID = testDID;
-    senderDIDDocument = testDIDDocument;
-    
-    // Generate a new keypair for the receiver
-    receiverKeypair = await veilid.crypto.generateKeypair();
-    const receiverPublicKeyHash = await blake3.hash(receiverKeypair.publicKey);
-    const receiverEncodedHash = base58btc.encode(receiverPublicKeyHash);
-    receiverDID = `did:vld:${receiverEncodedHash}`;
-    
-    // Publish the sender's DID Document
-    const documentBytes = Buffer.from(JSON.stringify(senderDIDDocument));
-    const signature = await veilid.crypto.sign(documentBytes, senderKeypair.privateKey);
-    
-    const documentWithProof = {
-      ...senderDIDDocument,
-      proof: {
-        type: "VeilidSignature2023",
-        created: new Date().toISOString(),
-        verificationMethod: `${senderDID}#primary`,
-        proofPurpose: "assertionMethod",
-        proofValue: base58btc.encode(signature)
-      }
-    };
-    
-    // Extract the method-specific ID
-    const methodSpecificId = senderDID.split(':')[2];
-    
-    // Publish to DHT
-    await veilid.dht.put(
-      methodSpecificId,
-      Buffer.from(JSON.stringify(documentWithProof))
-    );
-  });
-  
-  it('should verify the signature on a CirisMessage during round-trip', async () => {
-    // Create a test message
-    const message = {
-      id: `msg-${Date.now()}`,
-      from: senderDID,
-      to: receiverDID,
-      created: new Date().toISOString(),
-      type: "plaintext",
-      content: "Hello, Veilid!"
-    };
-    
-    // Sign the message
-    const messageBytes = Buffer.from(JSON.stringify(message));
-    const signature = await veilid.crypto.sign(messageBytes, senderKeypair.privateKey);
-    
-    // Add proof to the message
-    const signedMessage = {
-      ...message,
-      proof: {
-        type: "VeilidSignature2023",
-        created: new Date().toISOString(),
-        verificationMethod: `${senderDID}#primary`,
-        proofPurpose: "assertionMethod",
-        proofValue: base58btc.encode(signature)
-      }
-    };
-    
-    // Simulate message transmission (in a real system, this would involve network transport)
-    const receivedMessage = JSON.parse(JSON.stringify(signedMessage));
-    
-    // Resolve the sender's DID Document
-    const senderMethodSpecificId = senderDID.split(':')[2];
-    const result = await veilid.dht.get(senderMethodSpecificId);
-    const senderDocument = JSON.parse(result.toString());
-    
-    // Extract the verification method
-    const verificationMethod = senderDocument.verificationMethod.find(
-      vm => vm.id === receivedMessage.proof.verificationMethod
-    );
-    
-    // Extract the message without the proof for verification
-    const { proof, ...messageWithoutProof } = receivedMessage;
-    
-    // Verify the signature
-    const publicKey = base58btc.decode(verificationMethod.publicKeyMultibase);
-    const messageSignature = base58btc.decode(proof.proofValue);
-    
-    const isValid = await veilid.crypto.verify(
-      Buffer.from(JSON.stringify(messageWithoutProof)),
-      messageSignature,
-      publicKey
-    );
-    
-    // Check that verification succeeded
-    expect(isValid).to.be.true;
-  });
-});
-```
+## Recovery tests
 
-### Test 4: Key Rotation
+For every recovery mode:
 
-This test verifies that key rotation works correctly, allowing for the update of verification methods while maintaining identity continuity.
+- threshold and participant set are explicit;
+- insufficient approvals fail;
+- duplicated approval does not count twice;
+- approvals bind to DID, version, new controller, and expiry;
+- replay after recovery fails;
+- old controller behavior after recovery is specified;
+- lost recovery devices have a replacement path;
+- malicious recovery and controller races are deterministic.
 
-```javascript
-describe('Key Rotation', () => {
-  let originalKeypair;
-  let originalDID;
-  let originalDIDDocument;
-  let newKeypair;
-  
-  before(async () => {
-    await setupTestFixtures();
-    
-    // Use the test fixtures for the original identity
-    originalKeypair = testKeypair;
-    originalDID = testDID;
-    originalDIDDocument = testDIDDocument;
-    
-    // Generate a new keypair for rotation
-    newKeypair = await veilid.crypto.generateKeypair();
-    
-    // Publish the original DID Document
-    const documentBytes = Buffer.from(JSON.stringify(originalDIDDocument));
-    const signature = await veilid.crypto.sign(documentBytes, originalKeypair.privateKey);
-    
-    const documentWithProof = {
-      ...originalDIDDocument,
-      proof: {
-        type: "VeilidSignature2023",
-        created: new Date().toISOString(),
-        verificationMethod: `${originalDID}#primary`,
-        proofPurpose: "assertionMethod",
-        proofValue: base58btc.encode(signature)
-      }
-    };
-    
-    // Extract the method-specific ID
-    const methodSpecificId = originalDID.split(':')[2];
-    
-    // Publish to DHT
-    await veilid.dht.put(
-      methodSpecificId,
-      Buffer.from(JSON.stringify(documentWithProof))
-    );
-  });
-  
-  it('should update the DID Document with a new key during rotation', async () => {
-    // Create an updated DID Document with the new key
-    const updatedDocument = {
-      ...originalDIDDocument,
-      verificationMethod: [
-        ...originalDIDDocument.verificationMethod,
-        {
-          "id": `${originalDID}#recovery`,
-          "type": "VeilidVerificationKey2023",
-          "controller": originalDID,
-          "publicKeyMultibase": base58btc.encode(newKeypair.publicKey)
-        }
-      ],
-      authentication: [
-        ...originalDIDDocument.authentication,
-        `${originalDID}#recovery`
-      ],
-      updated: new Date().toISOString()
-    };
-    
-    // Sign with the original key
-    const documentBytes = Buffer.from(JSON.stringify(updatedDocument));
-    const signature = await veilid.crypto.sign(documentBytes, originalKeypair.privateKey);
-    
-    // Add proof to the updated document
-    const documentWithProof = {
-      ...updatedDocument,
-      proof: {
-        type: "VeilidSignature2023",
-        created: new Date().toISOString(),
-        verificationMethod: `${originalDID}#primary`,
-        proofPurpose: "assertionMethod",
-        proofValue: base58btc.encode(signature)
-      }
-    };
-    
-    // Extract the method-specific ID
-    const methodSpecificId = originalDID.split(':')[2];
-    
-    // Publish the updated document to DHT
-    await veilid.dht.put(
-      methodSpecificId,
-      Buffer.from(JSON.stringify(documentWithProof))
-    );
-    
-    // Resolve the updated document
-    const result = await veilid.dht.get(methodSpecificId);
-    const resolvedDocument = JSON.parse(result.toString());
-    
-    // Verify the document contains both keys
-    expect(resolvedDocument.verificationMethod).to.have.length(2);
-    
-    // Verify the new key is present
-    const hasNewKey = resolvedDocument.verificationMethod.some(
-      vm => vm.publicKeyMultibase === base58btc.encode(newKeypair.publicKey)
-    );
-    expect(hasNewKey).to.be.true;
-    
-    // Verify the document can be authenticated with both keys
-    expect(resolvedDocument.authentication).to.include(`${originalDID}#primary`);
-    expect(resolvedDocument.authentication).to.include(`${originalDID}#recovery`);
-  });
-  
-  it('should verify signatures made with the new key', async () => {
-    // Extract the method-specific ID
-    const methodSpecificId = originalDID.split(':')[2];
-    
-    // Resolve the updated document
-    const result = await veilid.dht.get(methodSpecificId);
-    const resolvedDocument = JSON.parse(result.toString());
-    
-    // Create a test message
-    const message = {
-      id: `msg-${Date.now()}`,
-      from: originalDID,
-      to: "did:vld:test-recipient",
-      created: new Date().toISOString(),
-      type: "plaintext",
-      content: "Message signed with new key"
-    };
-    
-    // Sign with the new key
-    const messageBytes = Buffer.from(JSON.stringify(message));
-    const signature = await veilid.crypto.sign(messageBytes, newKeypair.privateKey);
-    
-    // Add proof using the new verification method
-    const signedMessage = {
-      ...message,
-      proof: {
-        type: "VeilidSignature2023",
-        created: new Date().toISOString(),
-        verificationMethod: `${originalDID}#recovery`,
-        proofPurpose: "assertionMethod",
-        proofValue: base58btc.encode(signature)
-      }
-    };
-    
-    // Extract the verification method for the new key
-    const verificationMethod = resolvedDocument.verificationMethod.find(
-      vm => vm.id === signedMessage.proof.verificationMethod
-    );
-    
-    // Extract the message without the proof for verification
-    const { proof, ...messageWithoutProof } = signedMessage;
-    
-    // Verify the signature
-    const publicKey = base58btc.decode(verificationMethod.publicKeyMultibase);
-    const messageSignature = base58btc.decode(proof.proofValue);
-    
-    const isValid = await veilid.crypto.verify(
-      Buffer.from(JSON.stringify(messageWithoutProof)),
-      messageSignature,
-      publicKey
-    );
-    
-    // Check that verification succeeded
-    expect(isValid).to.be.true;
-  });
-});
-```
+## Deactivation tests
 
-## Running the Tests
+- Authorized deactivation succeeds.
+- Unauthorized deactivation fails.
+- Older active state never reactivates the DID.
+- Updates after deactivation fail.
+- Resolvers agree on deactivated metadata.
+- Deactivation remains discoverable after restart and cache loss.
+- Retention behavior is tested for the period the method promises.
 
-To run these tests, use a testing framework like Mocha:
+## Malicious state corpus
 
-```bash
-# Install dependencies
-npm install --save-dev mocha chai veilid blake3 base58-universal
+Maintain fixtures for:
 
-# Run tests
-npx mocha resolver-tests.js
-```
+- duplicate JSON keys or ambiguous binary fields;
+- deeply nested or decompression-bomb inputs;
+- invalid UTF-8;
+- unknown context/verification type;
+- repeated verification method IDs;
+- relationship reference to a missing method;
+- controller mismatch;
+- signature malleability cases relevant to the suite;
+- cross-protocol signature reuse;
+- invalid service endpoint types;
+- state with valid signature but invalid transition;
+- forked histories and rollback attempts.
 
-## Test Coverage
+## Real Veilid integration environment
 
-These tests cover the essential functionality of the `did:vld` resolver:
+Mocks are useful for deterministic errors but cannot prove network behavior. CI needs an isolated environment that:
 
-1. **DID Document Publication**: Tests the ability to publish a DID Document to the Veilid DHT.
-2. **DID Document Resolution**: Tests the ability to resolve a DID Document from the DHT and verify its signature.
-3. **CirisMessage Verification**: Tests the ability to verify signatures on messages during round-trip communication.
-4. **Key Rotation**: Tests the ability to update a DID Document with a new key and verify signatures made with the new key.
+1. starts the pinned Veilid version;
+2. waits for explicit healthy attachment;
+3. launches at least two independent clients;
+4. creates and publishes from one;
+5. resolves from another;
+6. injects disconnects, restarts, delays, and competing writes;
+7. saves non-sensitive logs and version metadata;
+8. tears down deterministically.
 
-## Conclusion
+Tests must say whether they use public Veilid infrastructure, a local network, or a mocked adapter.
 
-The resolver unit tests ensure that the `did:vld` method implementation correctly handles the core operations required for decentralized identifiers. By verifying that DID Documents can be published, resolved, and used for secure messaging, these tests help ensure the reliability and security of the system.
+## Privacy experiment requirements
 
-These tests also demonstrate that the Veilid layer satisfies the cryptographic verifiability requirements while remaining lightweight enough for real-time agent needs. The successful implementation of these tests confirms that the `did:vld` method is ready for integration into production systems.
+Do not publish a percentage without:
+
+- the adversary's observation capabilities;
+- network topology and sample size;
+- identifier and endpoint reuse assumptions;
+- timing distributions;
+- background traffic;
+- algorithm and parameters;
+- random seeds or repeated trials;
+- confidence intervals;
+- code and raw/derived data;
+- limitations.
+
+A result from synthetic identifiers in one process does not measure network deanonymization.
+
+## CI release gates
+
+A release candidate should require:
+
+- compile and formatting;
+- unit and property tests;
+- integration tests against a pinned Veilid version;
+- dependency and secret scanning;
+- fixture compatibility;
+- test coverage with meaningful branch review;
+- generated API documentation;
+- artifact checksums and provenance;
+- manual security approval for method-semantic changes.
+
+## Evidence format
+
+For every published claim, link to:
+
+- exact commit;
+- workflow run;
+- environment and dependency versions;
+- test name;
+- artifact or log;
+- expected and actual result;
+- known exclusions.
+
+That is how this page can eventually become a test report rather than a test plan.

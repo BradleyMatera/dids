@@ -1,246 +1,218 @@
-# Security Implications and Privacy Considerations
-
-
-
-Decentralized Identifiers (DIDs) introduce a paradigm shift in digital identity management, offering enhanced security and privacy compared to traditional centralized systems. However, they also present unique security challenges that must be addressed. This document explores the security implications and privacy considerations of DID implementations.
-
+---
+title: Security and privacy
+description: Threat-model DID systems across keys, method state, resolution, credentials, wallets, applications, and correlation before treating cryptographic validity as trust.
+section: Make decisions
+status: analysis
+source_path: docs/security/index.md
 ---
 
-## Table of Contents
+DIDs move some control away from conventional identity providers, but they also move lifecycle, recovery, resolver, and policy responsibilities into the method and application. Security depends on the complete system.
 
-- [Back to Front Page](../index.md)
-- [Security Advantages of DIDs](#security-advantages-of-dids)
-- [Key Security Challenges](#key-security-challenges)
-- [Privacy Considerations](#privacy-considerations)
-- [Threat Models](#threat-models)
-- [Best Practices for Secure Implementation](#best-practices-for-secure-implementation)
-- [Regulatory Compliance](#regulatory-compliance)
-- [Future Security Directions](#future-security-directions)
+<div class="callout">
+  <p><strong>Start with the protected action.</strong> “The DID resolved” and “the signature verified” are intermediate facts. The security question is whether the system should permit this payment, login, credential issuance, device command, or message.</p>
+</div>
 
----
+## Assets
 
-## Security Advantages of DIDs
+Identify what failure would harm:
 
-### Elimination of Central Points of Failure
+- controller private keys and recovery material;
+- DID method state and history;
+- credential contents and holder-binding keys;
+- wallet data and user consent;
+- application sessions and authorization;
+- service endpoints and routing metadata;
+- audit records;
+- availability of resolution and status checks;
+- unlinkability between relationships.
 
-Traditional identity systems rely on centralized databases that present attractive targets for attackers. A successful breach can compromise millions of identities simultaneously. DIDs distribute identity information across multiple systems, significantly reducing this risk.
+## Trust boundaries
 
-**Example**: Instead of storing all user credentials in a single database, DID-based systems may store verification methods on a blockchain, personal data in user-controlled storage, and authentication records in separate verifiable data registries.
+For each DID method, draw the real boundaries:
 
-### Cryptographic Verification
+1. **Controller device or KMS** generates and uses keys.
+2. **Wallet or agent** chooses identifiers, credentials, and disclosures.
+3. **Registry/network/domain** makes method state available.
+4. **Resolver** retrieves, validates, and caches state.
+5. **Verifier** checks cryptography and credential status.
+6. **Application policy** accepts issuers, roles, and assurance.
+7. **Operators and dependencies** update software and respond to incidents.
 
-DIDs leverage public-key cryptography to enable secure, tamper-evident identity assertions without requiring trusted third parties for every verification.
+A “decentralized” registry does not remove the other six.
 
-**Key Benefits**:
-- **Non-repudiation**: Digital signatures provide cryptographic proof of the signer's identity.
-- **Integrity Protection**: Any alteration to signed data is immediately detectable.
-- **Reduced Attack Surface**: Verification can occur without querying a central authority.
+## High-priority threats
 
-### User Control and Consent
+### Controller key compromise
 
-By design, DIDs place control of identity information with the identity subject, enhancing security through explicit consent mechanisms.
+An attacker may authenticate, issue assertions, or update state within the relationships authorized to that key.
 
-**Security Implications**:
-- Users can revoke compromised credentials without affecting their entire digital identity.
-- Selective disclosure allows sharing only necessary information, reducing exposure risk.
-- Consent can be cryptographically proven and audited.
+Controls:
 
----
+- hardware-backed or managed key storage;
+- purpose-separated keys;
+- least-privilege verification relationships;
+- rotation and emergency recovery;
+- short-lived application sessions;
+- device and transaction confirmation;
+- anomaly detection that does not become mass surveillance.
 
-## Key Security Challenges
+### Malicious state replacement
 
-### Key Management Complexity
+A candidate DID document can contain the attacker's key and a valid self-signature. Method state must be authorized by the previous trusted state or the method's root authorization rule.
 
-The security of a DID ultimately depends on the security of the corresponding private keys. This presents significant challenges:
+Controls:
 
-**Critical Issues**:
-- **Key Loss**: If a user loses their private key, they may permanently lose control of their DID.
-- **Key Compromise**: If a private key is stolen, an attacker can impersonate the DID controller.
-- **Key Rotation**: Regular key updates are security best practice but add complexity.
+- signed transition chains;
+- registry-enforced writer rules;
+- sequence/previous-state commitments;
+- rollback and replay protection;
+- independent resolver tests.
 
-**Mitigation Strategies**:
-- Social recovery mechanisms
-- Hardware security modules (HSMs)
-- Multi-signature schemes requiring multiple keys for critical operations
+### Resolver compromise
 
-For a detailed examination of key management challenges and solutions, see the [Key Rotation and Recovery](key-rotation-recovery.md) document, which provides comprehensive strategies for maintaining identity continuity while addressing key security concerns.
+A resolver can omit, modify, or return stale state; leak lookup metadata; follow dangerous endpoints; or map failures incorrectly.
 
-### Method-Specific Vulnerabilities
+Controls:
 
-Different DID methods have unique security properties and vulnerabilities:
+- validate method state locally where practical;
+- compare independent resolvers for high-risk flows;
+- pin method drivers and versions;
+- bound caching;
+- avoid automatically fetching service endpoints;
+- log typed errors without full identifiers.
 
-| DID Method | Security Strengths | Potential Vulnerabilities |
-|------------|-------------------|--------------------------|
-| **did:web** | Leverages existing web security | Relies on DNS and TLS security; domain ownership changes |
-| **did:ethr** | Blockchain immutability | Smart contract vulnerabilities; 51% attacks |
-| **did:key** | Simplicity, no external dependencies | No key rotation capability; limited functionality |
-| **did:ion** | High security through Bitcoin anchoring | Complex resolution process; reliance on IPFS |
+### Registry or network outage
 
-### Resolution Security
+Resolution failure can block authentication, message setup, or credential checks.
 
-The process of resolving a DID to its DID Document introduces several security considerations:
+Controls:
 
-- **Cache Poisoning**: Compromised resolvers might return malicious DID Documents.
-- **Man-in-the-Middle Attacks**: Interception during the resolution process.
-- **Denial of Service**: Preventing legitimate resolution requests.
+- defined offline and cached behavior;
+- multiple retrieval paths;
+- bounded cache validity;
+- failure modes matched to action risk;
+- monitoring and dependency status;
+- migration and continuity plans.
 
-**Mitigation Approaches**:
-- Using multiple resolvers and comparing results
-- Cryptographic verification of resolver responses
-- Local caching with integrity checks
+### Correlation
 
----
+A stable DID, key, endpoint, credential subject, or resolution pattern can link activity across services.
 
-## Privacy Considerations
+Controls:
 
-### Correlation Risks
+- relationship-specific identifiers and keys;
+- selective disclosure and data minimization;
+- avoid public personal data in DID documents;
+- endpoint and wallet telemetry review;
+- timing and network analysis;
+- credential designs that do not reintroduce a universal subject ID.
 
-DIDs aim to enhance privacy, but improper implementation can lead to correlation risks:
+See the [correlation threat model]({{ '/security/correlation-threat-model/' | relative_url }}).
 
-- **Persistent Identifiers**: Using the same DID across multiple contexts enables tracking.
-- **Blockchain Transparency**: Public ledgers may expose relationship patterns.
-- **Metadata Leakage**: Transaction data may reveal sensitive information.
+### Credential confusion
 
-**Privacy-Enhancing Techniques**:
-- **Pairwise DIDs**: Using different DIDs for different relationships.
-- **Zero-Knowledge Proofs**: Proving attributes without revealing the underlying data.
-- **Minimal Disclosure**: Sharing only necessary claims rather than entire credentials.
+A valid credential can still be unacceptable because the issuer is untrusted, the credential type is wrong, status is unknown, the proof purpose is wrong, or the claims are insufficient.
 
-For an in-depth analysis of correlation risks and a pairwise DID strategy implementation, see the [Correlation Threat Model](correlation-threat-model.md) document, which examines these issues in the context of the did:vld method.
+Controls:
 
-### Data Sovereignty and Storage
+- explicit issuer and credential-type policy;
+- proof, status, time, schema, audience, nonce, and holder-binding validation;
+- display verified claims and issuer separately;
+- avoid translating “valid signature” into “verified person.”
 
-Where and how identity data is stored has significant privacy implications:
+### Service endpoint abuse
 
-- **On-chain Storage**: Data stored directly on public blockchains is generally visible to all.
-- **Off-chain Storage**: Data stored in external systems requires careful access control.
-- **Self-hosted vs. Provider-hosted**: Trade-offs between convenience and control.
+DID documents can contain URLs or structured endpoints. Blind fetching creates SSRF, tracking, malware, and data-exfiltration risks.
 
-**Best Practices**:
-- Store minimal information on-chain (primarily public keys and service endpoints).
-- Use encrypted, user-controlled storage for personal data.
-- Implement robust access control for any shared data repositories.
+Controls:
 
-### Revocation and Updates
+- fetch only for a defined service type;
+- allowlist schemes and destinations;
+- block local/private network ranges where appropriate;
+- apply redirect, size, content-type, and timeout limits;
+- obtain user consent before contact reveals metadata.
 
-The ability to revoke credentials or update identity information is crucial for privacy:
+## Method-specific risk snapshot
 
-- **Revocation Transparency**: Revocation mechanisms should not reveal which specific credential was revoked.
-- **Update Privacy**: Changes to a DID Document should not unnecessarily expose the nature of the changes.
-- **Historical Data**: Previous versions of identity information may remain accessible in some systems.
+| Method family | Important dependencies | Typical security concern |
+|---|---|---|
+| Web-based | Registrar, DNS, CA, TLS, host, CDN | Account takeover or stale cached document |
+| Key-derived | Key generation and custody | No rotation or deactivation under the same DID |
+| Peer/local | Device sync, backups, relationship protocol | State loss and cross-device consistency |
+| Public ledger | Chain, contract, indexer, wallet, fees | Public metadata, contract bugs, governance/forks |
+| DHT-backed proposal | Network, record semantics, routing, retention | Latest-state ambiguity, availability, metadata leakage |
 
----
+## Privacy is not a feature flag
 
-## Threat Models
+Evaluate:
 
-Understanding potential threats is essential for secure DID implementation:
+- identifiers exposed to each party;
+- whether the same key appears in multiple DIDs;
+- information stored in public or replicated state;
+- lookup observers;
+- timing and update patterns;
+- IP and route metadata;
+- service endpoint reuse;
+- credentials shown together;
+- analytics and crash reporting;
+- backups, push notifications, and cloud sync.
 
-### Identity Theft and Impersonation
+Data minimization often does more than adding another cryptographic layer.
 
-- **Attack Vector**: Compromised private keys or social engineering.
-- **Impact**: Unauthorized access to services, fraudulent claims, reputation damage.
-- **Countermeasures**: Multi-factor authentication, biometric verification, behavioral analysis.
+## Key and algorithm policy
 
-### Surveillance and Tracking
+Maintain an explicit allowlist containing:
 
-- **Attack Vector**: Correlation of DID usage across services and contexts.
-- **Impact**: Loss of privacy, profiling, potential discrimination.
-- **Countermeasures**: Pairwise DIDs, privacy-preserving credentials, minimal disclosure.
+- key and signature type;
+- purpose/relationship;
+- minimum parameters;
+- library and provider;
+- supported method and document versions;
+- activation and retirement date;
+- migration path.
 
-### Denial of Service
+Reject unknown algorithms. “Cryptographic agility” means a governed migration mechanism, not accepting whatever string appears in a document.
 
-- **Attack Vector**: Flooding DID resolution services or verifiable data registries.
-- **Impact**: Inability to verify identities or access services.
-- **Countermeasures**: Rate limiting, proof-of-work challenges, distributed resolution.
+## Security review checklist
 
-### Quantum Computing Threats
+### Before implementation
 
-- **Attack Vector**: Quantum computers potentially breaking current cryptographic algorithms.
-- **Impact**: Compromise of all DIDs using vulnerable cryptography.
-- **Countermeasures**: Post-quantum cryptographic algorithms, crypto-agility in DID methods.
+- [ ] Protected actions and threat actors are named.
+- [ ] Method and trust dependencies are documented.
+- [ ] Private data and public state are separated.
+- [ ] Rotation, recovery, and deactivation are specified.
+- [ ] Simpler identifiers were considered.
 
----
+### Before pilot
 
-## Best Practices for Secure Implementation
+- [ ] Negative parser and resolver tests pass.
+- [ ] Key storage matches the action risk.
+- [ ] Replay, rollback, stale state, and endpoint abuse are tested.
+- [ ] Logs avoid identifiers, claims, keys, and network metadata where possible.
+- [ ] Dependency and incident owners are assigned.
 
-### Cryptographic Considerations
+### Before production
 
-- **Algorithm Selection**: Use well-established, peer-reviewed cryptographic algorithms.
-- **Key Length**: Ensure adequate key sizes (e.g., RSA 2048+ bits, ECC 256+ bits).
-- **Crypto-Agility**: Design systems to allow algorithm upgrades without breaking identity continuity.
+- [ ] Independent security review is complete.
+- [ ] Interoperability is tested outside the primary implementation.
+- [ ] Outage and recovery exercises have been run.
+- [ ] User recovery cannot silently bypass security policy.
+- [ ] Privacy claims are supported by a reproducible analysis.
+- [ ] Method, resolver, and cryptosuite upgrades have a migration plan.
 
-### Secure Development Lifecycle
+## What “fail closed” should mean
 
-- **Threat Modeling**: Conduct systematic analysis of potential threats during design.
-- **Code Review**: Implement peer review processes focusing on security aspects.
-- **Penetration Testing**: Regularly test DID implementations against common attack vectors.
-- **Security Updates**: Maintain a process for rapidly addressing discovered vulnerabilities.
+Fail closed for high-impact authorization when:
 
-### User Experience and Security
+- state is invalid or ambiguous;
+- a required current status cannot be obtained;
+- an algorithm or method version is unsupported;
+- a nonce or audience is wrong;
+- a DID is deactivated;
+- the application cannot establish the required verification relationship.
 
-- **Key Recovery**: Implement user-friendly, secure key recovery mechanisms.
-- **Clear Consent**: Ensure users understand what they're signing or sharing.
-- **Security Notifications**: Alert users to suspicious activities or required security actions.
-- **Progressive Security**: Layer security measures based on risk, avoiding overwhelming users.
+Do not disguise an outage as an invalid identity. Preserve typed failure information so support and incident responders can distinguish security rejection from unavailable infrastructure.
 
----
+## Continue
 
-## Regulatory Compliance
-
-DIDs must operate within existing regulatory frameworks:
-
-### Data Protection Regulations
-
-- **GDPR Considerations**: 
-  - Right to be forgotten vs. immutable records
-  - Data minimization principles
-  - Lawful basis for processing
-
-- **CCPA/CPRA Implications**:
-  - User control over personal information
-  - Disclosure requirements
-  - Opt-out mechanisms
-
-### Identity Verification Requirements
-
-- **KYC/AML Compliance**: 
-  - Verifiable credentials for regulatory compliance
-  - Auditability of verification processes
-  - Record-keeping requirements
-
-- **Industry-Specific Regulations**:
-  - Healthcare (HIPAA)
-  - Financial services (PSD2, FINRA)
-  - Government identity systems
-
----
-
-## Future Security Directions
-
-### Post-Quantum Cryptography
-
-As quantum computing advances, DID systems will need to migrate to quantum-resistant algorithms:
-
-- **Lattice-based cryptography**
-- **Hash-based signatures**
-- **Multivariate cryptography**
-
-### Decentralized Key Management
-
-Emerging approaches to simplify secure key management:
-
-- **Threshold signatures**
-- **Secure multiparty computation**
-- **Decentralized key recovery networks**
-
-### AI and Behavioral Biometrics
-
-Enhancing security through advanced authentication:
-
-- **Continuous authentication based on behavior patterns**
-- **AI-powered anomaly detection for suspicious DID usage**
-- **Contextual risk assessment for adaptive security measures**
-
----
-
-By addressing these security and privacy considerations, DID implementations can deliver on their promise of more secure, private, and user-controlled digital identity while mitigating potential risks.
+Review [rotation and recovery]({{ '/security/key-rotation-recovery/' | relative_url }}) as state-machine behavior, then use the [implementation acceptance gates]({{ '/implementations/' | relative_url }}).

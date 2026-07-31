@@ -1,0 +1,17 @@
+{
+  "name": "DID Field Guide",
+  "short_name": "DID Guide",
+  "description": "A standards-first field guide to decentralized identifiers.",
+  "start_url": "/dids/",
+  "display": "standalone",
+  "background_color": "#08101d",
+  "theme_color": "#09111f",
+  "icons": [
+    {
+      "src": "/dids/assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
+
