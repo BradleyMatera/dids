@@ -1,0 +1,104 @@
+- label: Start here
+  items:
+    - title: Field guide home
+      url: /
+      description: The shortest useful path through the research.
+      icon: home
+    - title: DIDs, clearly
+      url: /overview/
+      description: The data model, actors, and what a DID does not prove.
+      icon: compass
+    - title: Project status
+      url: /status/
+      description: What is standards-based, proposed, prototyped, or missing.
+      icon: pulse
+
+- label: Make decisions
+  items:
+    - title: Compare DID methods
+      url: /methods/
+      description: Choose by trust model, lifecycle, privacy, and cost.
+      icon: compare
+    - title: Security and privacy
+      url: /security/
+      description: Threats, controls, and deployment questions.
+      icon: shield
+    - title: Application patterns
+      url: /applications/
+      description: Where DIDs help and where simpler tools win.
+      icon: grid
+
+- label: Build
+  items:
+    - title: Implementation path
+      url: /implementations/
+      description: A standards-first build sequence and acceptance gates.
+      icon: code
+    - title: did:web + WebRTC
+      url: /implementations/web/
+      description: Authenticate signaling without confusing identity and transport.
+      icon: globe
+    - title: Veilid architecture
+      url: /implementations/veilid-did-implementation/
+      description: A design review for a possible DHT-backed DID method.
+      icon: network
+
+- label: Veilid research track
+  items:
+    - title: did:vld proposal
+      url: /methods/did-vld/
+      description: Experimental method requirements, open questions, and non-goals.
+      icon: flask
+      badge: Proposal
+    - title: Schema design notes
+      url: /implementations/capnp-schema-update/
+      description: A versioned envelope sketch, not a released schema.
+      icon: file
+      badge: Design
+    - title: Resolver test plan
+      url: /implementations/resolver-unit-tests/
+      description: Tests that must exist before implementation claims are valid.
+      icon: check
+      badge: Plan
+    - title: Correlation threat model
+      url: /security/correlation-threat-model/
+      description: Linkability risks without invented performance numbers.
+      icon: eye
+    - title: Rotation and recovery
+      url: /security/key-rotation-recovery/
+      description: State transitions, compromise handling, and failure modes.
+      icon: rotate
+
+- label: Use cases
+  items:
+    - title: AI agents
+      url: /applications/ai/
+      description: Stable identifiers, delegated authority, and provenance boundaries.
+      icon: spark
+    - title: Education
+      url: /applications/education/
+      description: Credentials, issuer trust, wallets, and verification.
+      icon: book
+    - title: IoT
+      url: /applications/iot/
+      description: Device identity across provisioning, operation, and retirement.
+      icon: chip
+    - title: Secure messaging
+      url: /applications/secure-messaging/
+      description: DIDComm, key agreement, routing, and metadata exposure.
+      icon: message
+
+- label: Reference
+  items:
+    - title: Adoption reality
+      url: /adoption/
+      description: What is deployed, what is adjacent, and what remains uneven.
+      icon: signal
+    - title: Standards tracker
+      url: /future/
+      description: Stable recommendations, active drafts, and watch items.
+      icon: timeline
+    - title: Sources and glossary
+      url: /reference/
+      description: Primary sources, terminology, and review policy.
+      icon: library

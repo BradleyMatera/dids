@@ -1,33 +1,104 @@
-# Decentralized Identifier (DID) Application Domains
+---
+title: Application patterns
+description: Evaluate where DIDs add portable control or cross-domain verification and where ordinary accounts, certificates, OAuth, or device registries are simpler.
+section: Make decisions
+status: comparison
+source_path: docs/applications/index.md
+---
 
+A DID is an infrastructure choice, not a user benefit by itself. Start with the interaction that must cross trust domains and ask whether a portable, method-controlled identifier materially improves it.
 
+## Use-case filter
 
-This section delves into the practical implementation and transformative potential of Decentralized Identifiers (DIDs) across a diverse range of application domains. As a foundational technology for self-sovereign identity (SSI) and verifiable data exchange, DIDs offer novel solutions to long-standing challenges in security, privacy, interoperability, and user control. The guides contained within this section provide detailed documentation, exploring domain-specific considerations, architectural patterns, implementation strategies, and concrete examples.
+| Question | If yes | If no |
+|---|---|---|
+| Must the identifier work across organizations? | A DID may reduce dependence on one account provider | Keep an internal identifier |
+| Must control be proven cryptographically? | Evaluate a DID, certificate, workload identity, or signed-key system | Normal authenticated accounts may suffice |
+| Must verification work without contacting the issuer each time? | Evaluate verifiable credentials and status design | OAuth/OIDC assertions may be simpler |
+| Must relationships avoid a public correlation handle? | Evaluate pairwise identifiers and disclosure design | A public organizational DID may fit |
+| Must keys rotate under the same identifier? | Choose a method with update/recovery | Static key-derived methods may fit |
+| Can you operate resolution and recovery safely? | Continue to method evaluation | Do not shift unsolved operations to users |
 
-## Available Application Guides
+## Patterns in this guide
 
-Explore the specific ways DIDs are being applied in the following areas:
+<div class="card-grid">
+  <a class="card" href="{{ '/applications/ai/' | relative_url }}">
+    <span class="card-label">Software identity</span>
+    <strong>AI agents</strong>
+    <p>Bind agent instances and delegated authority without claiming that a DID proves model behavior.</p>
+    <span class="card-link">Evaluate AI patterns →</span>
+  </a>
+  <a class="card" href="{{ '/applications/education/' | relative_url }}">
+    <span class="card-label">Portable claims</span>
+    <strong>Education</strong>
+    <p>Issue and verify credentials while keeping institutional trust and student privacy visible.</p>
+    <span class="card-link">Evaluate education →</span>
+  </a>
+  <a class="card" href="{{ '/applications/iot/' | relative_url }}">
+    <span class="card-label">Device lifecycle</span>
+    <strong>IoT</strong>
+    <p>Identify devices across owners and services, from manufacturing through retirement.</p>
+    <span class="card-link">Evaluate IoT →</span>
+  </a>
+  <a class="card" href="{{ '/applications/secure-messaging/' | relative_url }}">
+    <span class="card-label">Private relationships</span>
+    <strong>Secure messaging</strong>
+    <p>Separate DIDComm message security, routing, identity, and metadata exposure.</p>
+    <span class="card-link">Evaluate messaging →</span>
+  </a>
+</div>
 
-- [Back to Front Page](../index.md)
-- **[IoT Device Authentication and Lifecycle Management](iot.md)**: Addresses the unique challenges of securing and managing identities for potentially billions of connected devices. Explores how DIDs provide unique, persistent, and cryptographically verifiable identities for IoT devices, enabling secure onboarding, communication, data integrity, and end-of-life management in complex IoT ecosystems.
+## Common architecture
 
-- **[AI Systems: Identity Validation, Provenance Tracking, and Multi-Agent Coordination](ai.md)**: Investigates the critical role of DIDs in establishing trust and accountability within increasingly autonomous and distributed AI systems. Covers assigning verifiable identities to AI agents, tracking the provenance of AI-generated content and models, and facilitating secure communication and collaboration in multi-agent environments.
+Most useful credential or communication systems have:
 
-- **[Education: Academic Credentials and Student Identity Management](education.md)**: Details the revolution DIDs and Verifiable Credentials bring to academic credentialing. Focuses on issuing tamper-proof digital diplomas and transcripts, empowering students with control over their lifelong learning records, and streamlining verification processes for admissions and employment.
+1. an issuer or controller with keys;
+2. a subject, holder, device, or agent;
+3. a verifier or counterparty;
+4. a trust policy;
+5. identifier and key lifecycle;
+6. a protocol for exchange;
+7. status, expiry, and recovery behavior;
+8. privacy and audit controls.
 
-- **[Secure Communications and Messaging](secure-messaging.md)**: Examines how DIDs can enhance security, privacy, and trust in communication systems. Explores DID-based authentication for establishing secure channels, preventing phishing and spoofing, and enabling end-to-end encrypted messaging with verifiable identities for participants.
+The DID can address part of item 5. It does not replace the other seven.
 
-## Overview of DID Applications
+## Anti-patterns
 
-Decentralized Identifiers represent a paradigm shift, moving beyond centralized identity silos towards a more open, interoperable, and user-centric internet identity layer. Their transformative potential extends across numerous sectors, enabling new business models and enhancing existing processes. The guides presented here aim to bridge the gap between the theoretical promise of DIDs and their practical application, demonstrating how they can be leveraged to solve specific, real-world challenges within different domains.
+### Put personal data in the DID document
 
-Each detailed guide within this section follows a consistent and comprehensive structure:
+DID documents may be public, replicated, cached, and difficult to erase. Keep claims in credentials or application storage and disclose only what the transaction requires.
 
-1.  **Domain-Specific Challenges:** Identifies the key identity, security, or trust issues prevalent in the specific application area (e.g., IoT device spoofing, academic fraud, AI accountability).
-2.  **DID-Based Solutions:** Explains how the core properties of DIDs (persistence, resolvability, cryptographic verifiability, decentralization) and related technologies like Verifiable Credentials address these challenges.
-3.  **Architectural Patterns:** Presents common architectural models and implementation patterns for integrating DIDs within the domain's typical systems and workflows.
-4.  **Code Examples & Technical Details:** Provides illustrative code snippets (often pseudocode or conceptual examples) and discusses relevant technical considerations, protocols (like DIDComm), and library choices.
-5.  **Best Practices & Considerations:** Outlines recommended practices for security, privacy, usability, key management, and interoperability specific to the application domain.
-6.  **Future Directions & Potential:** Discusses emerging trends, ongoing research, and the future potential of DIDs within that specific sector.
+### Treat every verifier the same
 
-These guides are crafted to serve as valuable resources for developers building DID-enabled applications, architects designing new systems, product managers exploring innovative solutions, and decision-makers evaluating the strategic implications of decentralized identity within their specific field of operation. By understanding these practical applications, stakeholders can better harness the power of DIDs to build more secure, efficient, and trustworthy digital interactions.
+Different services need different claims, assurance levels, issuers, and privacy policies. Build policy around the transaction, not the existence of a signature.
+
+### Use one DID everywhere
+
+A universal identifier simplifies account linking for both the user and observers. Use a public DID only when public correlation is intentional.
+
+### Invent a method for the application
+
+Use an implemented method unless method research is the goal. A custom method creates parser, resolution, lifecycle, governance, interoperability, and security obligations.
+
+### Confuse a demo with deployment
+
+A QR code, signed JSON object, or DID document lookup can demonstrate a concept. Deployment also needs key custody, recovery, status, privacy, accessibility, support, monitoring, and migration.
+
+## Application decision record
+
+Record:
+
+- user or operator outcome;
+- why portability or cross-domain verification matters;
+- identifiers visible to each party;
+- selected method and alternatives;
+- credential or messaging protocol;
+- trust-policy owner;
+- key and recovery owner;
+- outage behavior;
+- data retention and correlation risk;
+- accessibility and non-digital fallback;
+- exit and migration plan.
+
+Then evaluate the choice against the [method comparison]({{ '/methods/' | relative_url }}) and [security review]({{ '/security/' | relative_url }}).

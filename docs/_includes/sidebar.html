@@ -1,0 +1,32 @@
+<aside class="sidebar" id="site-navigation" aria-label="Field guide navigation">
+  <div class="sidebar-head">
+    <span class="sidebar-kicker">Explore the field guide</span>
+    <button class="icon-button sidebar-close" type="button" data-nav-close aria-label="Close navigation">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+
+  <nav>
+    {% for group in site.data.navigation %}
+      <section class="nav-group" aria-labelledby="nav-group-{{ forloop.index }}">
+        <h2 id="nav-group-{{ forloop.index }}">{{ group.label }}</h2>
+        <ul>
+          {% for item in group.items %}
+            {% assign item_url = item.url | relative_url %}
+            <li>
+              <a href="{{ item_url }}" data-nav-link data-search-text="{{ item.title | escape }} {{ item.description | escape }}" {% if page.url == item.url %}aria-current="page"{% endif %}>
+                <span class="nav-icon">{% include icon.html name=item.icon %}</span>
+                <span class="nav-copy">
+                  <span class="nav-title">{{ item.title }}</span>
+                  <span class="nav-description">{{ item.description }}</span>
+                </span>
+                {% if item.badge %}<span class="nav-badge">{{ item.badge }}</span>{% endif %}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endfor %}
+  </nav>
+</aside>
+<div class="nav-scrim" data-nav-close></div>

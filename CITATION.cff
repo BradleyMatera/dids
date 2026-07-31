@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this field guide, cite the repository and the primary specifications it references."
+title: "DID Field Guide"
+type: dataset
+authors:
+  - family-names: Matera
+    given-names: Bradley
+repository-code: "https://github.com/BradleyMatera/dids"
+url: "https://bradleymatera.github.io/dids/"
+license: CC-BY-4.0
+date-released: 2026-07-31
+abstract: "A standards-first field guide to decentralized identifiers, method tradeoffs, security, implementation patterns, and an experimental Veilid-backed DID method proposal."
